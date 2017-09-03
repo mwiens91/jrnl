@@ -126,6 +126,19 @@ def getConfig():
     return None
 
 
+def isProgramAvailable(programName):
+    """Find if program passed in is available.
+
+    Arg:
+        programName: A string containing a program name.
+    Returns:
+        A boolean specifying whether the program specified is available.
+    """
+    return not subprocess.Popen(["bash", "-c", "type " + programName],
+                            stdout=subprocess.DEVNULL,
+                            stderr=subprocess.DEVNULL).wait()
+
+
 if __name__ == '__main__':
     # Run from command line
     main()
