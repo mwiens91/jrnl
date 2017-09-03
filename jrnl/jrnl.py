@@ -11,8 +11,9 @@ import sys
 import yaml
 
 NAME = "jrnl"
-VERSION = "0.0.0"
-DESCRIPTION = "%(prog)s - write a journal"
+PYPINAME = "jrnl-mw"
+VERSION = "0.0.4"
+DESCRIPTION = "write a journal"
 
 
 def main():
@@ -71,7 +72,7 @@ def parseRuntimeArguments():
     """
     parser = argparse.ArgumentParser(
             prog=NAME,
-            description=DESCRIPTION,)
+            description="%(prog)s - " + DESCRIPTION,)
 
     parser.add_argument(
             "--setup",
