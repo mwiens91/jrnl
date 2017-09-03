@@ -4,6 +4,7 @@
 
 import argparse
 import datetime
+import distutils.util
 import os
 import subprocess
 import sys
@@ -36,7 +37,7 @@ def main():
 
     # Make sure journal root directory exists
     if not os.path.isdir(configDict["journal_path"]):
-        if input("Create '" + configDict["journal_path"] + "'?"):
+        if prompt("Create '" + configDict["journal_path"] + "'?"):
             os.makedirs(configDict["journal_path"])
         else:
             return None
@@ -53,7 +54,7 @@ def main():
         os.makedirs(yearDirPath)
 
     # Open today's journal
-    entryPath = yearDirPath + today.strftime('%Y-%m-%d') + '.txt'
+    entryPath = os.path.join(yearDirPath, today.strftime('%Y-%m-%d') + '.txt')
     return subprocess.Popen([editorName, entryPath]).wait()
 
 
@@ -86,7 +87,7 @@ def parseRuntimeArguments():
 
 
 class PrintConfigAction(argparse.Action):
-    """argparse action to print configuration file."""
+    """argparse action to print configuration file and exit."""
     def __init__(self, option_strings, *args, **kwargs):
         super(PrintConfigAction, self).__init__(option_strings, *args, **kwargs)
 
@@ -98,10 +99,10 @@ class PrintConfigAction(argparse.Action):
         conf_dict["hours_past_midnight_included_in_day"] = 4
 
         # Print configuration file
-        print("Save this configuration file in any of the following:")
-        print("~/.jrnlrc\t~/.config/jrnl.conf\t$XDG_CONFIG_HOME/jrnl.conf")
-        print()
         print("# jrnl config file")
+        print("# Save this configuration file in any of the following:")
+        print("# ~/.jrnlrc\t~/.config/jrnl.conf\t$XDG_CONFIG_HOME/jrnl.conf")
+        print()
         print(yaml.dump(conf_dict, default_flow_style=False))
 
         # Exit
@@ -138,10 +139,15 @@ def getConfig():
         If a config setting can be found, returns a dictionary
         containing config settings; otherwise returns None.
     """
+    # Build list of possible config files
+    possibleConfigs = [os.path.expanduser("~/.jrnlrc"),
+                       os.path.expanduser("~/.config/jrnl.conf"),]
+
+    if os.environ.get("XDG_CONFIG_HOME"):
+        possibleConfigs += [os.environ.get("XDG_CONFIG_HOME") + "/jrnl.conf",]
+
     # Iterate through all possible config files
-    for configpath in [os.path.expanduser("~/.jrnlrc"),
-                       os.path.expanduser("~/.config/jrnl.conf"),
-                       os.environ.get("XDG_CONFIG_HOME") + "/jrnl.conf",]:
+    for configpath in possibleConfigs:
         if os.path.isfile(configpath):
             with open(configpath, "r") as configfile:
                 try:
@@ -166,6 +172,30 @@ def isProgramAvailable(programName):
     return not subprocess.Popen(["bash", "-c", "type " + programName],
                             stdout=subprocess.DEVNULL,
                             stderr=subprocess.DEVNULL).wait()
+
+
+def prompt(query):
+    """Prompt a yes/no question and get an answer.
+
+    A simple function to ask yes/no questions on the command line.
+    Credit goes to Matt Stevenson. See:
+    http://mattoc.com/python-yes-no-prompt-cli.html
+
+    Args:
+        query: A string containing a question.
+
+    Returns:
+        A boolean corresponding to the answer to the question asked.
+    """
+    sys.stdout.write("%s [y/n]: " % query)
+    val = input().lower()
+    try:
+        result = distutils.util.strtobool(val)
+    except ValueError:
+        # Result no good! Ask again.
+        sys.stdout.write("Please answer with y/n\n")
+        return prompt(query)
+    return result
 
 
 if __name__ == '__main__':
