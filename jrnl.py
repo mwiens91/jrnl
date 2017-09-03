@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # coding: utf-8
-"""Code description."""
+"""Source code for jrnl."""
 
 import argparse
 import os
@@ -9,7 +9,7 @@ import yaml
 
 NAME = "jrnl"
 VERSION = "0.0.0"
-DESCRIPTION = "%(prog)s - GREAT PROGRAM A+"
+DESCRIPTION = "%(prog)s - write a journal"
 
 
 def main():
@@ -17,11 +17,21 @@ def main():
     # Parse runtime options
     parseRuntimeArguments()
 
+    # Open up config file
+    configDict = getConfig()
+
+    # Leave if no config file
+    if not configDict:
+        print("No config file found!", file=sys.stderr)
+        sys.exit(1)
+
+    # Open up today's journal
+
 
 def parseRuntimeArguments():
     """Parse runtime arguments using argparse.
 
-    This will henerally return arguments as attributes, though some
+    This will generally return arguments as attributes, though some
     arguments will cause the program to exit.
 
     Returns:
@@ -41,7 +51,7 @@ def parseRuntimeArguments():
     parser.add_argument(
             "--version",
             action="version",
-            version="%(prog)s" + VERSION)
+            version="%(prog)s " + VERSION)
 
     return parser.parse_args()
 
@@ -83,6 +93,36 @@ def getUserEditor():
 def getUserJournalPath():
     """Return a string containing user's journal path."""
     return os.path.expanduser("~/path/to/journal")
+
+
+def getConfig():
+    """Find and return config settings dictionary.
+
+    Looks for config files located at
+
+    ~/.jrnlrc
+    ~/.config/jrnl.conf
+    $XDG_CONFIG_HOME/jrnl.conf
+
+    Returns:
+        If a config setting can be found, returns a dictionary
+        containing config settings; otherwise returns None.
+    """
+    # Iterate through all possible config files
+    for configpath in [os.path.expanduser("~/.jrnlrc"),
+                       os.path.expanduser("~/.config/jrnl.conf"),
+                       os.environ.get("XDG_CONFIG_HOME") + "/jrnl.conf",]:
+        if os.path.isfile(configpath):
+            with open(configpath, "r") as configfile:
+                try:
+                    return yaml.load(configfile)
+                except yaml.YAMLError as exc:
+                    # Something bad happened
+                    print(exc, file=sys.stderr)
+                    break
+
+    # None of earlier config files checked out
+    return None
 
 
 if __name__ == '__main__':
