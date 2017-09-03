@@ -3,6 +3,7 @@
 """Source code for jrnl."""
 
 import argparse
+import datetime
 import os
 import sys
 import yaml
@@ -31,6 +32,26 @@ def main():
         editorName = "sensible-editor"
     else:
         print(configDict["editor"] + " not available!", file=sys.stderr)
+
+    # Make sure journal root directory exists
+    if not os.path.isdir(configDict["journal_path"]):
+        if input("Create '" + configDict["journal_path"] + "'?"):
+            os.makedirs(configDict["journal_path"])
+        else:
+            return None
+
+    # By this point assume journal directory exists
+    # Find day entry to open, using previous day if hour early enough
+    today = datetime.datetime.today()
+    if today.hour < conf_dict["hours_past_midnight_included_in_day"]:
+        today = today - datetime.timedelta(days=1)
+
+    # Make the year directory if necessary
+    yearDirPath = os.path.join(configDict["journal_path"], str(today.year))
+    if not os.path.isdir(yearDirPath):
+        os.makedirs(yearDirPath)
+
+    # Open today's journal
 
 
 def parseRuntimeArguments():
