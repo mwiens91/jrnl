@@ -66,6 +66,7 @@ class PrintConfigAction(argparse.Action):
         conf_dict = dict()
         conf_dict["editor"] = getUserEditor()
         conf_dict["journal_path"] = getUserJournalPath()
+        conf_dict["hours_past_midnight_included_in_day"] = 4
 
         # Print configuration file
         print("Save this configuration file in any of the following:")
