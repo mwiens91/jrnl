@@ -13,19 +13,24 @@ DESCRIPTION = "%(prog)s - write a journal"
 
 
 def main():
-    """Main program logic for jrnl."""
+    """Main program for jrnl."""
     # Parse runtime options
     parseRuntimeArguments()
 
     # Open up config file
     configDict = getConfig()
 
-    # Leave if no config file
     if not configDict:
         print("No config file found!", file=sys.stderr)
         sys.exit(1)
 
-    # Open up today's journal
+    # Figure out what editor to use
+    if isProgramAvailable(configDict["editor"]):
+        editorName = configDict["editor"]
+    elif isProgramAvailable("sensible-editor"):
+        editorName = "sensible-editor"
+    else:
+        print(configDict["editor"] + " not available!", file=sys.stderr)
 
 
 def parseRuntimeArguments():
