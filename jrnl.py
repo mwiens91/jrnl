@@ -5,6 +5,7 @@
 import argparse
 import datetime
 import os
+import subprocess
 import sys
 import yaml
 
@@ -43,7 +44,7 @@ def main():
     # By this point assume journal directory exists
     # Find day entry to open, using previous day if hour early enough
     today = datetime.datetime.today()
-    if today.hour < conf_dict["hours_past_midnight_included_in_day"]:
+    if today.hour < configDict["hours_past_midnight_included_in_day"]:
         today = today - datetime.timedelta(days=1)
 
     # Make the year directory if necessary
@@ -52,6 +53,8 @@ def main():
         os.makedirs(yearDirPath)
 
     # Open today's journal
+    entryPath = yearDirPath + today.strftime('%Y-%m-%d') + '.txt'
+    return subprocess.Popen([editorName, entryPath]).wait()
 
 
 def parseRuntimeArguments():
