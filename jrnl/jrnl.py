@@ -41,7 +41,7 @@ def main():
         if prompt("Create '" + configDict["journal_path"] + "'?"):
             os.makedirs(configDict["journal_path"])
         else:
-            return None
+            sys.exit(1)
 
     # By this point assume journal directory exists
     # Find day entry to open, using previous day if hour early enough
@@ -56,7 +56,10 @@ def main():
 
     # Open today's journal
     entryPath = os.path.join(yearDirPath, today.strftime('%Y-%m-%d') + '.txt')
-    return subprocess.Popen([editorName, entryPath]).wait()
+    subprocess.Popen([editorName, entryPath]).wait()
+
+    # Exit
+    sys.exit(0)
 
 
 def parseRuntimeArguments():
