@@ -12,7 +12,7 @@ import yaml
 
 NAME = "jrnl"
 PYPINAME = "jrnl-mw"
-VERSION = "0.0.4"
+VERSION = "0.0.5"
 DESCRIPTION = "write a journal"
 
 
@@ -54,8 +54,13 @@ def main():
     if not os.path.isdir(yearDirPath):
         os.makedirs(yearDirPath)
 
-    # Open today's journal
+    # Append timestamp to journal entry if necessary
     entryPath = os.path.join(yearDirPath, today.strftime('%Y-%m-%d') + '.txt')
+
+    if configDict["write_timestamp"]:
+        writeTimestamp(entryPath)
+
+    # Open today's journal
     subprocess.Popen([editorName, entryPath]).wait()
 
     # Exit
@@ -101,7 +106,7 @@ class PrintConfigAction(argparse.Action):
         confdict["editor"] = getUserEditor()
         confdict["hours_past_midnight_included_in_day"] = 4
         confdict["journal_path"] = getUserJournalPath()
-        confdict["write_datetime_before_entering"] = True
+        confdict["write_timestamp"] = True
 
         # Print configuration file
         print("# jrnl config file")
@@ -203,6 +208,62 @@ def prompt(query):
     return result
 
 
+def writeTimestamp(entrypath, todayDatetime=datetime.datetime.today()):
+    """Write timestamp to journal entry, if one doesn't already exist.
+
+    Modifies a text file to include today's time and possibly date in
+    ISO 8601. How this works depends on the file being created/modified:
+
+    (1) If the journal entry text file doesn't already exist, create it
+        and write the date and time to the top of the file.
+    (2) If the journal entry already exists, look inside and see if
+        today's date is already written.  If today's date is not
+        written, write the date and time to the bottom of the file,
+        ensuring at least one empty line between the date and time and
+        whatever text came before it.  If today's date is written,
+        follow the same steps as if the date isn't written, but omit
+        writing the date; i.e., write only the time.
+
+    Args:
+        entrypath: A string containing a path to a journal entry,
+            already created or not.
+        todayDatetime: An optional datetime.datetime object representing
+            today's date.
+    """
+    # Get strings for today's date and time
+    todayDate = todayDatetime.strftime('%Y-%m-%d')
+    todayTime = todayDatetime.strftime("%H:%M")
+
+    # Check if journal entry already exists. If so write, the date and
+    # time to it.
+    if not os.path.isfile(entrypath):
+        with open(entrypath, 'x') as jrnlentry:
+            jrnlentry.write(todayDate + "\n" + todayTime + "\n")
+    else:
+        # Find if date already written
+        entrytext = open(entrypath).read()
+
+        if todayDate in entrytext:
+            printDate = False
+        else:
+            printDate = True
+
+        # Find if we need to insert a newline at the bottom of the file
+        if entrytext.endswith("\n\n"):
+            printNewLine = False
+        else:
+            printNewLine = True
+
+        # Write to the file
+        with open(entrypath, 'a') as jrnlentry:
+            jrnlentry.write(printNewLine * "\n"
+                            + (todayDate + "\n") * printDate
+                            + todayTime + "\n\n")
+
+
 if __name__ == '__main__':
     # Run from command line
-    main()
+    try:
+        main()
+    except KeyError:
+        print("Please update config file!", file=sys.stderr)
