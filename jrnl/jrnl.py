@@ -97,17 +97,18 @@ class PrintConfigAction(argparse.Action):
 
     def __call__(self, parser, namespace, values, option_string=None):
         # Build configuration file
-        conf_dict = dict()
-        conf_dict["editor"] = getUserEditor()
-        conf_dict["journal_path"] = getUserJournalPath()
-        conf_dict["hours_past_midnight_included_in_day"] = 4
+        confdict = dict()
+        confdict["editor"] = getUserEditor()
+        confdict["hours_past_midnight_included_in_day"] = 4
+        confdict["journal_path"] = getUserJournalPath()
+        confdict["write_datetime_before_entering"] = True
 
         # Print configuration file
         print("# jrnl config file")
         print("# Save this configuration file in any of the following:")
         print("# ~/.jrnlrc\t~/.config/jrnl.conf\t$XDG_CONFIG_HOME/jrnl.conf")
         print()
-        print(yaml.dump(conf_dict, default_flow_style=False))
+        print(yaml.dump(confdict, default_flow_style=False))
 
         # Exit
         sys.exit(0)
