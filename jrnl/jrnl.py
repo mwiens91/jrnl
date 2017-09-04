@@ -12,14 +12,14 @@ import yaml
 
 NAME = "jrnl"
 PYPINAME = "jrnl-mw"
-VERSION = "0.0.5"
+VERSION = "0.0.6"
 DESCRIPTION = "write a journal"
 
 
 def main():
     """Main program for jrnl."""
     # Parse runtime options
-    parseRuntimeArguments()
+    runtimeArgs = parseRuntimeArguments()
 
     # Open up config file
     configDict = getConfig()
@@ -57,7 +57,8 @@ def main():
     # Append timestamp to journal entry if necessary
     entryPath = os.path.join(yearDirPath, today.strftime('%Y-%m-%d') + '.txt')
 
-    if configDict["write_timestamp"]:
+    if (configDict["write_timestamp"] and not runtimeArgs.no_timestamp) or (
+            runtimeArgs.timestamp):
         writeTimestamp(entryPath)
 
     # Open today's journal
@@ -91,6 +92,15 @@ def parseRuntimeArguments():
             "--version",
             action="version",
             version="%(prog)s " + VERSION)
+    timestamp_option = parser.add_mutually_exclusive_group()
+    timestamp_option.add_argument(
+            "-t", "--timestamp",
+            help="write a timestamp before opening editor",
+            action="store_true")
+    timestamp_option.add_argument(
+            "--no-timestamp",
+            help="don't write a timestamp before opening editor",
+            action="store_true")
 
     return parser.parse_args()
 
@@ -180,8 +190,8 @@ def isProgramAvailable(programName):
         A boolean specifying whether the program specified is available.
     """
     return not subprocess.Popen(["bash", "-c", "type " + programName],
-                            stdout=subprocess.DEVNULL,
-                            stderr=subprocess.DEVNULL).wait()
+                                stdout=subprocess.DEVNULL,
+                                stderr=subprocess.DEVNULL).wait()
 
 
 def prompt(query):
