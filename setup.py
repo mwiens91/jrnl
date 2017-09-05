@@ -17,6 +17,7 @@ setup(
         'Operating System :: Unix',
         'Programming Language :: Python :: 3 :: Only',
     ],
+    data_files=[('/usr/local/man/man1', ['jrnl.1']),],
     packages=['jrnl'],
     entry_points={
         'console_scripts': ['jrnl = jrnl.jrnl:main'],
