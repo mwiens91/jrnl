@@ -35,6 +35,7 @@ def main():
         editorName = "sensible-editor"
     else:
         print(configDict["editor"] + " not available!", file=sys.stderr)
+        sys.exit(1)
 
     # Make sure journal root directory exists
     if not os.path.isdir(configDict["journal_path"]):
