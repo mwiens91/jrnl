@@ -55,9 +55,10 @@ def main():
     if not os.path.isdir(yearDirPath):
         os.makedirs(yearDirPath)
 
-    # Append timestamp to journal entry if necessary
+    # Determine path the journal entry text file
     entryPath = os.path.join(yearDirPath, today.strftime('%Y-%m-%d') + '.txt')
 
+    # Append timestamp to journal entry if necessary
     if (configDict["write_timestamp"] and not runtimeArgs.no_timestamp) or (
             runtimeArgs.timestamp):
         writeTimestamp(entryPath)
@@ -72,8 +73,8 @@ def main():
 def parseRuntimeArguments():
     """Parse runtime arguments using argparse.
 
-    This will generally return arguments as attributes, though some
-    arguments will cause the program to exit.
+    This will generally return runtime arguments as attributes, though
+    some runtime arguments will cause the program to exit.
 
     Returns:
         An object of type 'argparse.Namespace' containing the runtime
@@ -159,6 +160,7 @@ def getConfig():
     possibleConfigs = [os.path.expanduser("~/.jrnlrc"),
                        os.path.expanduser("~/.config/jrnl.conf"),]
 
+    # Also look in XDG dirs, provided they exist
     if os.environ.get("XDG_CONFIG_HOME"):
         possibleConfigs += [os.environ.get("XDG_CONFIG_HOME") + "/jrnl.conf",]
 
@@ -180,6 +182,10 @@ def getConfig():
 def isProgramAvailable(programName):
     """Find if program passed in is available.
 
+    There's probably a better way to do this, and in a sense it's not
+    "safe", but for the scope of this program, the below approach is
+    fine.
+
     Arg:
         programName: A string containing a program name.
     Returns:
@@ -197,9 +203,8 @@ def prompt(query):
     Credit goes to Matt Stevenson. See:
     http://mattoc.com/python-yes-no-prompt-cli.html
 
-    Args:
+    Arg:
         query: A string containing a question.
-
     Returns:
         A boolean corresponding to the answer to the question asked.
     """
@@ -224,11 +229,10 @@ def writeTimestamp(entrypath, todayDatetime=datetime.datetime.today()):
         and write the date and time to the top of the file.
     (2) If the journal entry already exists, look inside and see if
         today's date is already written.  If today's date is not
-        written, write the date and time to the bottom of the file,
-        ensuring at least one empty line between the date and time and
-        whatever text came before it.  If today's date is written,
-        follow the same steps as if the date isn't written, but omit
-        writing the date; i.e., write only the time.
+        written, append the date and time to the file, ensuring at least
+        one empty line between the date and time and whatever text came
+        before it.  If today's date *is* written, follow the same steps
+        as but omit writing the date; i.e., write only the time.
 
     Args:
         entrypath: A string containing a path to a journal entry,
