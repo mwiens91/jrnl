@@ -116,7 +116,7 @@ class PrintConfigAction(argparse.Action):
         confdict = dict()
         confdict["editor"] = getUserEditor()
         confdict["hours_past_midnight_included_in_day"] = 4
-        confdict["journal_path"] = getUserJournalPath()
+        confdict["journal_path"] = os.path.expanduser("~/path/to/journal")
         confdict["write_timestamp"] = True
 
         # Print configuration file
@@ -140,11 +140,6 @@ def getUserEditor():
     else:
         # Leave it to the user
         return "editor_name_here"
-
-
-def getUserJournalPath():
-    """Return a string containing user's journal path."""
-    return os.path.expanduser("~/path/to/journal")
 
 
 def getConfig():
