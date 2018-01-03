@@ -42,7 +42,7 @@ def main():
         if prompt("Create '" + configDict["journal_path"] + "'?"):
             os.makedirs(configDict["journal_path"])
         else:
-            sys.exit(1)
+            sys.exit(0)
 
     # By this point assume journal directory exists
     # Find day entry to open, using previous day if hour early enough
