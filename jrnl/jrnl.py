@@ -9,10 +9,11 @@ import os
 import subprocess
 import sys
 import yaml
+import dateutil.parser
 
 NAME = "jrnl"
 PYPINAME = "jrnl-mw"
-VERSION = "0.0.7"
+VERSION = "0.0.8"
 DESCRIPTION = "write a journal"
 
 
@@ -44,27 +45,35 @@ def main():
         else:
             sys.exit(0)
 
-    # By this point assume journal directory exists
-    # Find day entry to open, using previous day if hour early enough
-    today = datetime.datetime.today()
-    if today.hour < configDict["hours_past_midnight_included_in_day"]:
-        today = today - datetime.timedelta(days=1)
+    # Build datetime objects for the relevant dates
+    if runtimeArgs.date:
+        # Use dates given in runtime argument
 
-    # Make the year directory if necessary
-    yearDirPath = os.path.join(configDict["journal_path"], str(today.year))
-    if not os.path.isdir(yearDirPath):
-        os.makedirs(yearDirPath)
+        # TODO allow for negative offsetting, e.g., '-1' means
+        # yesterday, 0 means today
 
-    # Determine path the journal entry text file
-    entryPath = os.path.join(yearDirPath, today.strftime('%Y-%m-%d') + '.txt')
+        dates = [dateutil.parser.parse(date, fuzzy=True)
+                    for date in runtimeArgs.date]
+    else:
+        # Use today's date (or previous day if hour early enough
+        today = datetime.datetime.today()
 
-    # Append timestamp to journal entry if necessary
-    if (configDict["write_timestamp"] and not runtimeArgs.no_timestamp) or (
-            runtimeArgs.timestamp):
-        writeTimestamp(entryPath)
+        if today.hour < configDict["hours_past_midnight_included_in_day"]:
+            today = today - datetime.timedelta(days=1)
 
-    # Open today's journal
-    subprocess.Popen([editorName, entryPath]).wait()
+        dates = [today]
+
+    # Determine whether to write timestamp based on runtime args and
+    # whether to only open existing files
+    writetimestamp = (runtimeArgs.timestamp
+                        or (configDict["write_timestamp"]
+                                and not runtimeArgs.no_timestamp))
+    readmode = bool(runtimeArgs.date)
+
+    # Open journal entries corresponding to the current date
+    for date in dates:
+        openEntry(date, editorName, configDict["journal_path"],
+                  writetimestamp, readmode)
 
     # Exit
     sys.exit(0)
@@ -270,6 +279,46 @@ def writeTimestamp(entrypath, todayDatetime=datetime.datetime.today()):
             jrnlentry.write(printNewLine * "\n"
                             + (todayDate + "\n") * printDate
                             + todayTime + "\n\n")
+
+
+def openEntry(datetimeobj, editor, journalPath, dotimestamp, inreadmode,
+              errorstream=sys.stderr):
+    """Try opening a journal entry.
+
+    Args:
+        datetimeobj: A datetime.datetime object containing which day's
+            journal entry to open.
+        editor: A string containing the name of the editor to use.
+        journalPath: A string containing the path to the journal's base
+            directory.
+        dotimestamp: A boolean signalling whether to append a timestamp
+            to a journal entry before opening.
+        inreadmode: A boolean signalling whether to only open existing
+            entries ("read mode").
+        errorstream: An optional TextIO object to send error messages
+            to. Almost certainly you want to use the default standard
+            error output.
+    """
+
+    # Determine path the journal entry text file
+    yearDirPath = os.path.join(journalPath, str(datetimeobj.year))
+    entryPath = os.path.join(yearDirPath, datetimeobj.strftime('%Y-%m-%d') + '.txt')
+
+    # If in read mode, only open existing entries
+    if inreadmode and not os.path.exists(entryPath):
+        print("%s does not exist!" % entryPath, file=errorstream)
+        return
+
+    # Make the year directory if necessary
+    if not os.path.isdir(yearDirPath):
+        os.makedirs(yearDirPath)
+
+    # Append timestamp to journal entry if necessary
+    if dotimestamp:
+        writeTimestamp(entryPath)
+
+    # Open the date's journal
+    subprocess.Popen([editor, entryPath]).wait()
 
 
 if __name__ == '__main__':

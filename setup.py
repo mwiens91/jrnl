@@ -22,4 +22,7 @@ setup(
     entry_points={
         'console_scripts': ['jrnl = jrnl.jrnl:main'],
     },
+    install_requires=[
+        'dateutil',
+    ],
 )
