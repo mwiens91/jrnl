@@ -89,29 +89,30 @@ def parseRuntimeArguments():
             "--setup",
             help="print configuration file and exit",
             nargs=0,
-            action=PrintConfigAction)
+            action=PrintConfigAction,)
     parser.add_argument(
             "--version",
             action="version",
-            version="%(prog)s " + VERSION)
+            version="%(prog)s " + VERSION,)
     timestamp_option = parser.add_mutually_exclusive_group()
+    timestamp_option.add_argument(
+            "-d", "--date",
+            help="journal date(s) to open (-1, -2, etc., allowed)",
+            nargs="*",)
     timestamp_option.add_argument(
             "-t", "--timestamp",
             help="write a timestamp before opening editor",
-            action="store_true")
+            action="store_true",)
     timestamp_option.add_argument(
             "--no-timestamp",
             help="don't write a timestamp before opening editor",
-            action="store_true")
+            action="store_true",)
 
     return parser.parse_args()
 
 
 class PrintConfigAction(argparse.Action):
     """argparse action to print configuration file and exit."""
-    def __init__(self, option_strings, *args, **kwargs):
-        super(PrintConfigAction, self).__init__(option_strings, *args, **kwargs)
-
     def __call__(self, parser, namespace, values, option_string=None):
         # Build configuration file
         confdict = dict()
@@ -138,9 +139,9 @@ def getUserEditor():
 
     if editorName:
         return editorName
-    else:
-        # Leave it to the user
-        return "editor_name_here"
+
+    # Leave it to the user
+    return "editor_name_here"
 
 
 def getConfig():
