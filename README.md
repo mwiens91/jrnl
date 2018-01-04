@@ -1,7 +1,40 @@
 # jrnl
 
-A small program to help write a personal journal. At present, doesn't do
-too much; but more to come soon.
+A program to help manage a personal journal.
+
+## Usage
+
+Set up your journal by printing out a config file, like so:
+
+```
+jrnl --setup
+```
+and fill out the path to the root of your journal.
+
+Open up today's journal entry with
+
+```
+jrnl
+```
+
+which will open up the appropriate journal entry in your favourite text editor.
+
+You can generate a timestamp before opening the entry by using the `-t` flag:
+
+```
+jrnl -t
+```
+
+or you can have timestamps always written by specifying so in the config file.
+
+To open up yesterday's journal, or January 1 1999's journal, type
+
+```
+jrnl --dates -1
+jrnl --dates January 1 1999
+```
+
+## Other details
 
 Right now you're constrained to having a journal structure like so:
 
@@ -26,8 +59,10 @@ You'd write stuff here.
 And more stuff here.
 ```
 
-## How to install?
+## How do I install this?
 
 ```
-sudo pip3 install jrnl-mw
+pip3 install jrnl-mw
 ```
+
+Run the above as root to get a nice `man` page with the program.
