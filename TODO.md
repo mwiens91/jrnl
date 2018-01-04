@@ -1,1 +1,1 @@
-# Make runnable with no config file
+* add wrapper for grep
