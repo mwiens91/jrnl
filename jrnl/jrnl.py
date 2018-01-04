@@ -46,14 +46,14 @@ def main():
             sys.exit(0)
 
     # Build datetime objects for the relevant dates
-    if runtimeArgs.date:
+    if runtimeArgs.dates:
         # Use dates given in runtime argument
 
         # TODO allow for negative offsetting, e.g., '-1' means
         # yesterday, 0 means today
 
         dates = [dateutil.parser.parse(date, fuzzy=True)
-                    for date in runtimeArgs.date]
+                    for date in runtimeArgs.dates]
     else:
         # Use today's date (or previous day if hour early enough
         today = datetime.datetime.today()
@@ -68,7 +68,7 @@ def main():
     writetimestamp = (runtimeArgs.timestamp
                         or (configDict["write_timestamp"]
                                 and not runtimeArgs.no_timestamp))
-    readmode = bool(runtimeArgs.date)
+    readmode = bool(runtimeArgs.dates)
 
     # Open journal entries corresponding to the current date
     for date in dates:
@@ -105,8 +105,8 @@ def parseRuntimeArguments():
             version="%(prog)s " + VERSION,)
     timestamp_option = parser.add_mutually_exclusive_group()
     timestamp_option.add_argument(
-            "-d", "--date",
-            help="journal date(s) to open (-1, -2, etc., allowed)",
+            "-d", "--dates",
+            help="journal date(s) to open (-1, -2, offsetting allowed)",
             nargs="*",)
     timestamp_option.add_argument(
             "-t", "--timestamp",
