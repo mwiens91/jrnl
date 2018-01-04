@@ -8,6 +8,11 @@ from jrnl import helpers
 from jrnl.version import DESCRIPTION, NAME, VERSION
 
 
+class ConfigException(Exception):
+    """An exception used when loading config fails."""
+    pass
+
+
 class PrintConfigAction(argparse.Action):
     """argparse action to print configuration file and exit."""
     def __call__(self, parser, namespace, values, option_string=None):
@@ -103,4 +108,4 @@ def getConfig():
                     break
 
     # None of earlier config files checked out
-    return None
+    raise ConfigException

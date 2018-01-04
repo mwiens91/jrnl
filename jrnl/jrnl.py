@@ -17,9 +17,9 @@ def main():
     runtimeArgs = runoptions.parseRuntimeArguments()
 
     # Open up config file
-    configDict = runoptions.getConfig()
-
-    if not configDict:
+    try:
+        configDict = runoptions.getConfig()
+    except runoptions.ConfigException:
         print("No config file found!", file=sys.stderr)
         sys.exit(1)
 
