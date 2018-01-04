@@ -1,5 +1,5 @@
 from setuptools import setup
-from jrnl.jrnl import DESCRIPTION, PYPINAME, VERSION
+from jrnl.version import DESCRIPTION, PYPINAME, VERSION
 
 setup(
     name=PYPINAME,
@@ -17,7 +17,7 @@ setup(
         'Operating System :: Unix',
         'Programming Language :: Python :: 3 :: Only',
     ],
-    data_files=[('/usr/local/man/man1', ['jrnl.1']),],
+    data_files=[('/usr/local/man/man1', ['man/jrnl.1']),],
     packages=['jrnl'],
     entry_points={
         'console_scripts': ['jrnl = jrnl.jrnl:main'],
