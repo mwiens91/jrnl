@@ -47,15 +47,27 @@ def main():
 
     # Build datetime objects for the relevant dates
     if runtimeArgs.dates:
-        # Use dates given in runtime argument
+        # Parse dates given in runtime argument
+        dates = []
 
-        # TODO allow for negative offsetting, e.g., '-1' means
-        # yesterday, 0 means today
+        for datestring in runtimeArgs.dates:
+            # Check for negative offsetting first
+            try:
+                offset = int(datestring)
 
-        dates = [dateutil.parser.parse(date, fuzzy=True)
-                    for date in runtimeArgs.dates]
+                # Limits for the offset so we don't misinterpret a date
+                # as an offset
+                if offset > 1e6:
+                    raise ValueError
+
+                # Create datetime object using offset from current day
+                dates.append(datetime.datetime.today()
+                                + datetime.timedelta(days=offset))
+            except ValueError:
+                dates.append(dateutil.parser.parse(datestring, fuzzy=True))
+
     else:
-        # Use today's date (or previous day if hour early enough
+        # Use today's date (or previous day if hour early enough)
         today = datetime.datetime.today()
 
         if today.hour < configDict["hours_past_midnight_included_in_day"]:
