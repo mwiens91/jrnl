@@ -23,6 +23,6 @@ setup(
         'console_scripts': ['jrnl = jrnl.jrnl:main'],
     },
     install_requires=[
-        'dateutil',
+        'python-dateutil',
     ],
 )
