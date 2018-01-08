@@ -30,9 +30,12 @@ or you can have timestamps always written by specifying so in the config file.
 To open up yesterday's journal, or January 1 1999's journal, type
 
 ```
-jrnl --dates -1
-jrnl --dates January 1 1999
+jrnl -1
+jrnl "January 1 1999"
 ```
+
+You can open up more than one date at once by giving more date
+arguments.
 
 ## Other details
 

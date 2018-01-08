@@ -42,11 +42,12 @@ def main():
     # Build datetime objects for the relevant dates
     if runtimeArgs.dates:
         # Parse dates given in runtime argument
+        TODAY = False
         dates = []
 
         for datestring in runtimeArgs.dates:
-            # Check for negative offsetting first
             try:
+                # Check for negative offsetting first
                 offset = int(datestring)
 
                 # Limits for the offset so we don't misinterpret a date
@@ -58,23 +59,31 @@ def main():
                 dates.append(datetime.datetime.today()
                                 + datetime.timedelta(days=offset))
             except ValueError:
+                # Assume the date-string is a date, not an offset
                 dates.append(dateutil.parser.parse(datestring, fuzzy=True))
-
     else:
         # Use today's date (or previous day if hour early enough)
+        TODAY = True
         today = datetime.datetime.today()
 
-        if today.hour < configDict["hours_past_midnight_included_in_day"]:
+        if today.hour < configDict["hours_past_midnight_included_in_today"]:
             today = today - datetime.timedelta(days=1)
 
         dates = [today]
 
-    # Determine whether to write timestamp based on runtime args and
-    # whether to only open existing files
-    writetimestamp = (runtimeArgs.timestamp
-                        or (configDict["write_timestamp"]
-                                and not runtimeArgs.no_timestamp))
-    readmode = bool(runtimeArgs.dates)
+    # Determine whether to write timestamp based on runtime args
+    if TODAY:
+        writetimestamp = (runtimeArgs.timestamp
+                            or (configDict["write_timestamp_for_today"]
+                                    and not runtimeArgs.no_timestamp))
+    else:
+        writetimestamp = (runtimeArgs.timestamp
+                            or (configDict["write_timestamp_for_other_days"]
+                                    and not runtimeArgs.no_timestamp))
+
+    # Determine whether to only open existing files
+    readmode = (bool(runtimeArgs.dates)
+                  and not configDict["open_new_entries_for_other_days"])
 
     # Open journal entries corresponding to the current date
     for date in dates:
@@ -85,41 +94,43 @@ def main():
     sys.exit(0)
 
 
-def writeTimestamp(entrypath, todayDatetime=datetime.datetime.today()):
+def writeTimestamp(entrypath, thisDatetime=datetime.datetime.today()):
     """Write timestamp to journal entry, if one doesn't already exist.
 
-    Modifies a text file to include today's time and possibly date in
-    ISO 8601. How this works depends on the file being created/modified:
+    Modifies a text file to include the passed in datetime's time and
+    possibly date in ISO 8601 format. How this works depends on the file
+    being created/modified:
 
     (1) If the journal entry text file doesn't already exist, create it
         and write the date and time to the top of the file.
     (2) If the journal entry already exists, look inside and see if
-        today's date is already written.  If today's date is not
-        written, append the date and time to the file, ensuring at least
-        one empty line between the date and time and whatever text came
-        before it.  If today's date *is* written, follow the same steps
-        as but omit writing the date; i.e., write only the time.
+        the datetime's date is already written.  If the datetime's date
+        is not written, append the date and time to the file, ensuring
+        at least one empty line between the date and time and whatever
+        text came before it.  If the datetime's date *is* written,
+        follow the same steps as but omit writing the date; i.e., write
+        only the time.
 
     Args:
         entrypath: A string containing a path to a journal entry,
             already created or not.
-        todayDatetime: An optional datetime.datetime object representing
+        thisDatetime: An optional datetime.datetime object representing
             today's date.
     """
     # Get strings for today's date and time
-    todayDate = todayDatetime.strftime('%Y-%m-%d')
-    todayTime = todayDatetime.strftime("%H:%M")
+    thisDate = thisDatetime.strftime('%Y-%m-%d')
+    thisTime = thisDatetime.strftime("%H:%M")
 
     # Check if journal entry already exists. If so write, the date and
     # time to it.
     if not os.path.isfile(entrypath):
         with open(entrypath, 'x') as jrnlentry:
-            jrnlentry.write(todayDate + "\n" + todayTime + "\n")
+            jrnlentry.write(thisDate + "\n" + thisTime + "\n")
     else:
         # Find if date already written
         entrytext = open(entrypath).read()
 
-        if todayDate in entrytext:
+        if thisDate in entrytext:
             printDate = False
         else:
             printDate = True
@@ -133,8 +144,8 @@ def writeTimestamp(entrypath, todayDatetime=datetime.datetime.today()):
         # Write to the file
         with open(entrypath, 'a') as jrnlentry:
             jrnlentry.write(printNewLine * "\n"
-                            + (todayDate + "\n") * printDate
-                            + todayTime + "\n\n")
+                            + (thisDate + "\n") * printDate
+                            + thisTime + "\n\n")
 
 
 def openEntry(datetimeobj, editor, journalPath, dotimestamp, inreadmode,

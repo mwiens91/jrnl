@@ -6,18 +6,15 @@
 jrnl \- write a journal
 
 .SH SYNOPSIS
-\fBjrnl\fR [\fIOPTIONS\fR]
+\fBjrnl\fR [\fIDATES\fI] [\fIOPTIONS\fR]
 
 .SH DESCRIPTION
-\fIjrnl\fR is a program to help manage a personal journal.
+\fIjrnl\fR is a program to help manage a personal journal. This needs a configuration file to run, which can be generated with the \fI--setup\fR option.
 
+.SH DATES
+If you don't supply any dates, \fIjrnl\fR will open a journal entry for today's date and, if you tell it to, write a timestamp at right now's time. Otherwise you can specify a number of dates to open using a combination of any sensible date formats or an integer offset from today's date. If you do specify dates, by default this will not create new entries, but you can change this behavior in the config file.
 
 .SH OPTIONS
-.
-.TP
-\fB-d --dates\fR
-specify which journal dates to open. Cannot be used with timestamp, nor can it be used to open new (i.e., non-existant) journal entries.
-.
 .
 .TP
 \fB-h --help\fR

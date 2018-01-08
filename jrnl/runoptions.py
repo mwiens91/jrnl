@@ -19,14 +19,20 @@ class PrintConfigAction(argparse.Action):
         # Build configuration file
         confdict = dict()
         confdict["editor"] = helpers.getUserEditor()
-        confdict["hours_past_midnight_included_in_day"] = 4
+        confdict["hours_past_midnight_included_in_today"] = 4
         confdict["journal_path"] = os.path.expanduser("~/path/to/journal")
-        confdict["write_timestamp"] = True
+        confdict["open_new_entries_for_other_days"] = False
+        confdict["write_timestamp_for_other_days"] = False
+        confdict["write_timestamp_for_today"] = True
 
         # Print configuration file
         print("# jrnl config file")
         print("# Save this configuration file in any of the following:")
         print("# ~/.jrnlrc\t~/.config/jrnl.conf\t$XDG_CONFIG_HOME/jrnl.conf")
+        print("#")
+        print("# 'today' is a date (today) when running with no arguments")
+        print(("# 'other day' means a day, possibly even today"
+               " when running with specified date arguments"))
         print()
         print(yaml.dump(confdict, default_flow_style=False))
 
@@ -48,7 +54,11 @@ def parseRuntimeArguments():
     parser = argparse.ArgumentParser(
             prog=NAME,
             description="%(prog)s - " + DESCRIPTION,)
-
+    parser.add_argument(
+            "dates",
+            help=("journal date(s) to open (-1, -2, offsetting allowed)."
+                 " Defaults to right now."),
+            nargs="*",)
     parser.add_argument(
             "--setup",
             help="print configuration file and exit",
@@ -59,10 +69,6 @@ def parseRuntimeArguments():
             action="version",
             version="%(prog)s " + VERSION,)
     timestamp_option = parser.add_mutually_exclusive_group()
-    timestamp_option.add_argument(
-            "-d", "--dates",
-            help="journal date(s) to open (-1, -2, offsetting allowed)",
-            nargs="*",)
     timestamp_option.add_argument(
             "-t", "--timestamp",
             help="write a timestamp before opening editor",
