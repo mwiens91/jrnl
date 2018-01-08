@@ -182,7 +182,7 @@ def openEntry(datetimeobj, editor, journalPath, dotimestamp, inreadmode,
 
     # Append timestamp to journal entry if necessary
     if dotimestamp:
-        writeTimestamp(entryPath)
+        writeTimestamp(entryPath, datetimeobj)
 
     # Open the date's journal
     subprocess.Popen([editor, entryPath]).wait()
