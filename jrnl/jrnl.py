@@ -76,7 +76,11 @@ def main():
                 except ValueError:
                     # The date given was not valid!
                     print("%s is not a valid date!", file=sys.stderr)
-                    sys.exit(1)
+
+        if not dates:
+            # No valid dates given
+            print("No valid dates given! Aborting.", file=sys.stderr)
+            sys.exit(1)
     else:
         # Use settings applicable when not specifying date
         TODAY = True
