@@ -32,7 +32,7 @@ class PrintConfigAction(argparse.Action):
         print("#")
         print("# 'today' is a date (today) when running with no arguments")
         print(("# 'other day' means a day, possibly even today"
-               " when running with specified date arguments"))
+               " when running with specific date arguments"))
         print()
         print(yaml.dump(confdict, default_flow_style=False))
 
@@ -56,7 +56,7 @@ def parseRuntimeArguments():
             description="%(prog)s - " + DESCRIPTION,)
     parser.add_argument(
             "dates",
-            help=("journal date(s) to open (-1, -2, offsetting allowed)."
+            help=("journal date(s) to open ('-1', '-2'-offsetting allowed)."
                  " Defaults to right now."),
             nargs="*",)
     parser.add_argument(
