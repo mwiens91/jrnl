@@ -59,8 +59,13 @@ def main():
                 dates.append(datetime.datetime.today()
                                 + datetime.timedelta(days=offset))
             except ValueError:
-                # Assume the date-string is a date, not an offset
-                dates.append(dateutil.parser.parse(datestring, fuzzy=True))
+                try:
+                    # Assume the date-string is a date, not an offset
+                    dates.append(dateutil.parser.parse(datestring, fuzzy=True))
+                except ValueError:
+                    # The date given was not valid!
+                    print("%s is not a valid date!", file=sys.stderr)
+                    sys.exit(1)
     else:
         # Use today's date (or previous day if hour early enough)
         TODAY = True
