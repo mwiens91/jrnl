@@ -37,6 +37,12 @@ jrnl "January 1 1999"
 You can open up more than one date at once by giving more date
 arguments.
 
+jrnl also comes with a wrapper for grep which you can invoke as follows:
+
+```
+jrnl grep <pattern>
+```
+
 ## Other details
 
 Right now you're constrained to having a journal structure like so:
