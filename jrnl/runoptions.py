@@ -54,10 +54,7 @@ def parseRuntimeArguments():
     # Annoyingly, subparsers and the dates argument don't work nicely
     # together - order matters. If using grep, add subparser support
     # first.  Otherwise, add the subparser support after.
-    if len(sys.argv) > 1 and sys.argv[1] == 'grep':
-        GIVE_GREP_PRIORITY = True
-    else:
-        GIVE_GREP_PRIORITY = False
+    GIVE_GREP_PRIORITY = bool(len(sys.argv) > 1 and sys.argv[1] == 'grep')
 
     # A function to add subparser support
     def addSubParsers(parser_):
