@@ -7,6 +7,7 @@ import os
 import subprocess
 import sys
 import dateutil.parser
+from jrnl import grep_wrapper
 from jrnl import helpers
 from jrnl import runoptions
 
@@ -23,6 +24,21 @@ def main():
         print("No config file found!", file=sys.stderr)
         sys.exit(1)
 
+    # Make sure journal root directory exists
+    if not os.path.isdir(configDict["journal_path"]):
+        if helpers.prompt("Create '" + configDict["journal_path"] + "'?"):
+            os.makedirs(configDict["journal_path"])
+        else:
+            sys.exit(0)
+
+    # Use grep mode if requested
+    if runtimeArgs.subparser_name == 'grep':
+        grep_wrapper.grep_wrapper(runtimeArgs.pattern,
+                                  configDict["journal_path"],
+                                  years=runtimeArgs.years,
+                                  extra_opts=runtimeArgs.options)
+        sys.exit(0)
+
     # Figure out what editor to use
     if helpers.isProgramAvailable(configDict["editor"]):
         editorName = configDict["editor"]
@@ -31,13 +47,6 @@ def main():
     else:
         print(configDict["editor"] + " not available!", file=sys.stderr)
         sys.exit(1)
-
-    # Make sure journal root directory exists
-    if not os.path.isdir(configDict["journal_path"]):
-        if helpers.prompt("Create '" + configDict["journal_path"] + "'?"):
-            os.makedirs(configDict["journal_path"])
-        else:
-            sys.exit(0)
 
     # Get today's datetime
     today = datetime.datetime.today()
