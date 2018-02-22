@@ -39,6 +39,15 @@ def main():
         else:
             sys.exit(0)
 
+    # Get today's datetime
+    today = datetime.datetime.today()
+
+    # Respect the "hours past midnight included in day" setting
+    if today.hour < configDict["hours_past_midnight_included_in_today"]:
+        latenight_offset = datetime.timedelta(days=-1)
+    else:
+        latenight_offset = datetime.timedelta()
+
     # Build datetime objects for the relevant dates
     if runtimeArgs.dates:
         # Parse dates given in runtime argument
@@ -57,24 +66,22 @@ def main():
 
                 # Create datetime object using offset from current day
                 dates.append(datetime.datetime.today()
-                                + datetime.timedelta(days=offset))
+                                + datetime.timedelta(days=offset)
+                                + latenight_offset)
             except ValueError:
                 try:
                     # Assume the date-string is a date, not an offset
-                    dates.append(dateutil.parser.parse(datestring, fuzzy=True))
+                    dates.append(dateutil.parser.parse(datestring, fuzzy=True)
+                                 + latenight_offset)
                 except ValueError:
                     # The date given was not valid!
                     print("%s is not a valid date!", file=sys.stderr)
                     sys.exit(1)
     else:
-        # Use today's date (or previous day if hour early enough)
+        # Use settings applicable when not specifying date
         TODAY = True
-        today = datetime.datetime.today()
 
-        if today.hour < configDict["hours_past_midnight_included_in_today"]:
-            today = today - datetime.timedelta(days=1)
-
-        dates = [today]
+        dates = [today + latenight_offset]
 
     # Determine whether to write timestamp based on runtime args
     if TODAY:
