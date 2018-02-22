@@ -100,7 +100,7 @@ def main():
     # Open journal entries corresponding to the current date
     for date in dates:
         openEntry(date, editorName, configDict["journal_path"],
-                  writetimestamp, readmode)
+                  writetimestamp, readmode, TODAY)
 
     # Exit
     sys.exit(0)
@@ -161,7 +161,7 @@ def writeTimestamp(entrypath, thisDatetime=datetime.datetime.today()):
 
 
 def openEntry(datetimeobj, editor, journalPath, dotimestamp, inreadmode,
-              errorstream=sys.stderr):
+              istoday, errorstream=sys.stderr):
     """Try opening a journal entry.
 
     Args:
@@ -172,6 +172,8 @@ def openEntry(datetimeobj, editor, journalPath, dotimestamp, inreadmode,
             directory.
         dotimestamp: A boolean signalling whether to append a timestamp
             to a journal entry before opening.
+        istoday: A boolean signalling whether to use the current
+            datetime for the timestamp.
         inreadmode: A boolean signalling whether to only open existing
             entries ("read mode").
         errorstream: An optional TextIO object to send error messages
@@ -194,7 +196,11 @@ def openEntry(datetimeobj, editor, journalPath, dotimestamp, inreadmode,
 
     # Append timestamp to journal entry if necessary
     if dotimestamp:
-        writeTimestamp(entryPath, datetimeobj)
+        # Determine whether to use timestamp for *now*
+        if istoday:
+            writeTimestamp(entryPath)
+        else:
+            writeTimestamp(entryPath, datetimeobj)
 
     # Open the date's journal
     subprocess.Popen([editor, entryPath]).wait()
