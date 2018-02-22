@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # coding: utf-8
-"""Source code for jrnl."""
+"""Main jrnl functionality."""
 
 import datetime
 import os

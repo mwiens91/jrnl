@@ -78,6 +78,16 @@ def parseRuntimeArguments():
             help="don't write a timestamp before opening editor",
             action="store_true",)
 
+    # Parser for sub-commands
+    subparsers = parser.add_subparsers()
+
+    # Sub-command for grep wrapper
+    grep_parser = subparsers.add_parser("grep", help="grep wrapper")
+    grep_parser.add_argument(
+            "time span",
+            help="year, month, or day to grep over",
+            nargs="*",)
+
     return parser.parse_args()
 
 
