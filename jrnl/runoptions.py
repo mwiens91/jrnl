@@ -51,9 +51,35 @@ def parseRuntimeArguments():
         arguments as attributes. See argparse documentation for more
         details.
     """
+    # Annoyingly, subparsers and the dates argument don't work nicely
+    # together - order matters. If using grep, add subparser support
+    # first.  Otherwise, add the subparser support after.
+    if len(sys.argv) > 1 and sys.argv[1] == 'grep':
+        GIVE_GREP_PRIORITY = True
+    else:
+        GIVE_GREP_PRIORITY = False
+
+    # A function to add subparser support
+    def addSubParsers(parser_):
+        """Add subparser support for sub-commands.
+        Arg:
+            parser_: An argparse.ArgumentParser
+
+        Returns:
+            An argparse._SubParsersAction subparsers . . . thing?
+        """
+        return parser_.add_subparsers(dest="subparser_name", title="commands")
+
+    # Instantiate the parser
     parser = argparse.ArgumentParser(
             prog=NAME,
             description="%(prog)s - " + DESCRIPTION,)
+
+    # Give subparser support first if using grep
+    if GIVE_GREP_PRIORITY:
+        subparsers = addSubParsers(parser)
+
+    # Continue as normal
     parser.add_argument(
             "dates",
             help=("journal date(s) to open ('-1', '-2'-offsetting allowed)."
@@ -78,17 +104,28 @@ def parseRuntimeArguments():
             help="don't write a timestamp before opening editor",
             action="store_true",)
 
-    # Parser for sub-commands
-    subparsers = parser.add_subparsers()
+    # Give subparser support if we haven't done so already
+    if not GIVE_GREP_PRIORITY:
+        subparsers = addSubParsers(parser)
 
-    # Sub-command for grep wrapper
-    grep_parser = subparsers.add_parser("grep", help="grep wrapper")
+    # Add grep subcommand
+    grep_parser = subparsers.add_parser(
+            "grep",
+            help=("print lines from a time span matching a pattern."
+                  " Will accept any grep options."))
     grep_parser.add_argument(
-            "time span",
-            help="year, month, or day to grep over",
-            nargs="*",)
+            "pattern",
+            help="search pattern",)
+    grep_parser.add_argument(
+            "-y", "--years",
+            help="which years' entries to search in",
+            nargs="+",)
 
-    return parser.parse_args()
+    # Parse args and add grep options in if existing
+    namespace, extras = parser.parse_known_args()
+    namespace.options = extras
+
+    return namespace
 
 
 def getConfig():
