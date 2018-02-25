@@ -32,12 +32,16 @@ def main():
             sys.exit(0)
 
     # Use grep mode if requested
-    if runtimeArgs.subparser_name == 'grep':
-        grep_wrapper.grep_wrapper(runtimeArgs.pattern,
-                                  configDict["journal_path"],
-                                  years=runtimeArgs.years,
-                                  extra_opts=runtimeArgs.options)
-        sys.exit(0)
+    try:
+        if runtimeArgs.subparser_name == 'grep':
+            grep_wrapper.grep_wrapper(runtimeArgs.pattern,
+                                      configDict["journal_path"],
+                                      years=runtimeArgs.years,
+                                      extra_opts=runtimeArgs.options)
+            sys.exit(0)
+    except AttributeError:
+        # Grep mode not requested
+        pass
 
     # Figure out what editor to use
     if helpers.isProgramAvailable(configDict["editor"]):

@@ -52,8 +52,7 @@ def parseRuntimeArguments():
         details.
     """
     # Annoyingly, subparsers and the dates argument don't work nicely
-    # together - order matters. If using grep, add subparser support
-    # first.  Otherwise, add the subparser support after.
+    # together - order matters. If using grep, add subparser support.
     GIVE_GREP_PRIORITY = bool(len(sys.argv) > 1 and sys.argv[1] == 'grep')
 
     # A function to add subparser support
@@ -72,9 +71,23 @@ def parseRuntimeArguments():
             prog=NAME,
             description="%(prog)s - " + DESCRIPTION,)
 
-    # Give subparser support first if using grep
+    # Give subparser support if using grep
     if GIVE_GREP_PRIORITY:
         subparsers = addSubParsers(parser)
+
+        # Add grep subcommand
+        grep_parser = subparsers.add_parser(
+                "grep",
+                help=("print lines from a time span matching a pattern."
+                      " Will accept any grep options."))
+        grep_parser.add_argument(
+                "pattern",
+                help="search pattern",)
+        grep_parser.add_argument(
+                "-y", "--years",
+                help="which years' entries to search in",
+                nargs="+",)
+
 
     # Continue as normal
     parser.add_argument(
@@ -101,24 +114,8 @@ def parseRuntimeArguments():
             help="don't write a timestamp before opening editor",
             action="store_true",)
 
-    # Give subparser support if we haven't done so already
-    if not GIVE_GREP_PRIORITY:
-        subparsers = addSubParsers(parser)
-
-    # Add grep subcommand
-    grep_parser = subparsers.add_parser(
-            "grep",
-            help=("print lines from a time span matching a pattern."
-                  " Will accept any grep options."))
-    grep_parser.add_argument(
-            "pattern",
-            help="search pattern",)
-    grep_parser.add_argument(
-            "-y", "--years",
-            help="which years' entries to search in",
-            nargs="+",)
-
-    # Parse args and add grep options in if existing
+    # This looks needlessly complicated, but it's necessary to pass in
+    # arbitrary options into grep
     namespace, extras = parser.parse_known_args()
     namespace.options = extras
 
