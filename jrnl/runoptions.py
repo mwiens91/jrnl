@@ -78,6 +78,11 @@ def parseRuntimeArguments():
         # Add grep subcommand
         grep_parser = subparsers.add_parser(
                 "grep",
+                description=("%(prog)s - "
+                      "print lines from a time span matching a pattern."
+                      " Will accept all grep options (which are not "
+                      " listed here);"
+                      " see 'man grep' for more details."),
                 help=("print lines from a time span matching a pattern."
                       " Will accept any grep options."))
         grep_parser.add_argument(
