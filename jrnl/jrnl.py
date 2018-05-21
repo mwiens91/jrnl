@@ -88,7 +88,8 @@ def main():
                                  + latenight_offset)
                 except ValueError:
                     # The date given was not valid!
-                    print("%s is not a valid date!", file=sys.stderr)
+                    print("%s is not a valid date!" % datestring,
+                          file=sys.stderr)
 
         if not dates:
             # No valid dates given
