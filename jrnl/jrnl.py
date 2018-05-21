@@ -72,9 +72,9 @@ def main():
                 # Check for negative offsetting first
                 offset = int(datestring)
 
-                # Limits for the offset so we don't misinterpret a date
-                # as an offset
-                if offset > 1e6:
+                if offset > 0:
+                    # Don't allow offseting from the future. Check if
+                    # the argument passed in is a date instead
                     raise ValueError
 
                 # Create datetime object using offset from current day
