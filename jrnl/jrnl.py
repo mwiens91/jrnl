@@ -55,8 +55,8 @@ def main():
     # Get today's datetime
     today = datetime.datetime.today()
 
-    # Respect the "hours past midnight included in day" setting
-    if today.hour < configDict["hours_past_midnight_included_in_today"]:
+    # Respect the "hours past midnight included in date" setting
+    if today.hour < configDict["hours_past_midnight_included_in_date"]:
         latenight_offset = datetime.timedelta(days=-1)
     else:
         latenight_offset = datetime.timedelta()

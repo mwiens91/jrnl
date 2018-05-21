@@ -19,7 +19,7 @@ class PrintConfigAction(argparse.Action):
         # Build configuration file
         confdict = dict()
         confdict["editor"] = helpers.getUserEditor()
-        confdict["hours_past_midnight_included_in_today"] = 4
+        confdict["hours_past_midnight_included_in_date"] = 4
         confdict["journal_path"] = os.path.expanduser("~/path/to/journal")
         confdict["open_new_entries_for_other_days"] = False
         confdict["write_timestamp_for_other_days"] = False
