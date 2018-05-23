@@ -89,32 +89,31 @@ def parseRuntimeArguments():
         grep_parser.add_argument(
                 "pattern",
                 help="search pattern",)
-
-
-    # Continue as normal
-    parser.add_argument(
-            "dates",
-            help=("journal date(s) to open ('-1', '-2'-offsetting allowed)."
-                 " Defaults to right now."),
-            nargs="*",)
-    parser.add_argument(
-            "--setup",
-            help="print configuration file and exit",
-            nargs=0,
-            action=PrintConfigAction,)
-    parser.add_argument(
-            "--version",
-            action="version",
-            version="%(prog)s " + VERSION,)
-    timestamp_option = parser.add_mutually_exclusive_group()
-    timestamp_option.add_argument(
-            "-t", "--timestamp",
-            help="write a timestamp before opening editor",
-            action="store_true",)
-    timestamp_option.add_argument(
-            "--no-timestamp",
-            help="don't write a timestamp before opening editor",
-            action="store_true",)
+    else:
+        # Continue as normal
+        parser.add_argument(
+                "dates",
+                help=("journal date(s) to open."
+                     " Defaults to right now."),
+                nargs="*",)
+        parser.add_argument(
+                "--setup",
+                help="print configuration file and exit",
+                nargs=0,
+                action=PrintConfigAction,)
+        parser.add_argument(
+                "--version",
+                action="version",
+                version="%(prog)s " + VERSION,)
+        timestamp_option = parser.add_mutually_exclusive_group()
+        timestamp_option.add_argument(
+                "-t", "--timestamp",
+                help="write a timestamp before opening editor",
+                action="store_true",)
+        timestamp_option.add_argument(
+                "--no-timestamp",
+                help="don't write a timestamp before opening editor",
+                action="store_true",)
 
     # This looks needlessly complicated, but it's necessary to pass in
     # arbitrary options into grep
