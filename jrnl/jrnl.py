@@ -36,7 +36,6 @@ def main():
         if runtimeArgs.subparser_name == 'grep':
             grep_wrapper.grep_wrapper(runtimeArgs.pattern,
                                       configDict["journal_path"],
-                                      years=runtimeArgs.years,
                                       extra_opts=runtimeArgs.options)
             sys.exit(0)
     except AttributeError:

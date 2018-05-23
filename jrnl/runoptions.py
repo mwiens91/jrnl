@@ -89,10 +89,6 @@ def parseRuntimeArguments():
         grep_parser.add_argument(
                 "pattern",
                 help="search pattern",)
-        grep_parser.add_argument(
-                "-y", "--years",
-                help="which years' entries to search in",
-                nargs="+",)
 
 
     # Continue as normal
