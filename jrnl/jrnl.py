@@ -64,7 +64,6 @@ def main():
     # Build datetime objects for the relevant dates
     if runtimeArgs.dates:
         # Parse dates given in runtime argument
-        NO_DATE_ARGS = False
         dates = []
 
         for datestring in runtimeArgs.dates:
@@ -97,23 +96,16 @@ def main():
             sys.exit(1)
     else:
         # Use settings applicable when not specifying date
-        NO_DATE_ARGS = True
-
         dates = [today + latenight_date_offset]
 
     # Determine whether to write timestamp based on runtime args
-    if NO_DATE_ARGS:
-        writetimestamp = (runtimeArgs.timestamp
-                            or (configDict["write_timestamp_for_today"]
-                                    and not runtimeArgs.no_timestamp))
-    else:
-        writetimestamp = (runtimeArgs.timestamp
-                            or (configDict["write_timestamp_for_other_days"]
-                                    and not runtimeArgs.no_timestamp))
+    writetimestamp = (runtimeArgs.timestamp
+                        or (configDict["write_timestamps_by_default"]
+                                and not runtimeArgs.no_timestamp))
 
     # Determine whether to only open existing files
     readmode = (bool(runtimeArgs.dates)
-                  and not configDict["open_new_entries_for_other_days"])
+                and not configDict["create_new_entries_when_specifying_dates"])
 
     # Open journal entries corresponding to the current date
     for date in dates:

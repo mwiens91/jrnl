@@ -19,26 +19,21 @@ class PrintConfigAction(argparse.Action):
         # Build configuration file
         confdict = dict()
         confdict["editor"] = helpers.getUserEditor()
-        confdict["hours_past_midnight_included_in_date"] = 4
         confdict["journal_path"] = os.path.expanduser("~/path/to/journal")
-        confdict["open_new_entries_for_other_days"] = False
-        confdict["write_timestamp_for_other_days"] = False
-        confdict["write_timestamp_for_today"] = True
+        confdict["hours_past_midnight_included_in_date"] = 4
+        confdict["create_new_entries_when_specifying_dates"] = False
+        confdict["write_timestamps_by_default"] = True
 
         # Print configuration file
         print("# jrnl config file")
         print("# Save this configuration file in any of the following:")
         print("# ~/.jrnlrc\t~/.config/jrnl.conf\t$XDG_CONFIG_HOME/jrnl.conf")
         print("#")
-        print("# - 'today' is a current date when running with no specific")
-        print("#   date arguments")
-        print("# - 'other day' means a day, possibly even the current date,")
-        print("#   when running with specific date arguments")
-        print("# - 'hours_past_midnight_included_in_date' is the number of")
-        print("#   hours into the next date a date's journal entries should")
-        print("#   cover. Example: say this setting is set to 4. Then if it")
-        print("#   was 03:00 on 2018-03-03, jrnl would open up 2018-03-02's")
-        print("#   journal entries")
+        print("# 'hours_past_midnight_included_in_date' is the number of")
+        print("# hours into the next date a date's journal entries should")
+        print("# cover. Example: say this setting is set to 4. Then if it")
+        print("# was 03:00 on 2018-03-03, jrnl would open up 2018-03-02's")
+        print("# journal entries")
         print()
         print(yaml.dump(confdict, default_flow_style=False))
 
