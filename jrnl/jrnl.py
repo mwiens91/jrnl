@@ -64,7 +64,7 @@ def main():
     # Build datetime objects for the relevant dates
     if runtimeArgs.dates:
         # Parse dates given in runtime argument
-        TODAY = False
+        NO_DATE_ARGS = False
         dates = []
 
         for datestring in runtimeArgs.dates:
@@ -97,12 +97,12 @@ def main():
             sys.exit(1)
     else:
         # Use settings applicable when not specifying date
-        TODAY = True
+        NO_DATE_ARGS = True
 
         dates = [today + latenight_date_offset]
 
     # Determine whether to write timestamp based on runtime args
-    if TODAY:
+    if NO_DATE_ARGS:
         writetimestamp = (runtimeArgs.timestamp
                             or (configDict["write_timestamp_for_today"]
                                     and not runtimeArgs.no_timestamp))
@@ -118,7 +118,7 @@ def main():
     # Open journal entries corresponding to the current date
     for date in dates:
         openEntry(date, editorName, configDict["journal_path"],
-                  writetimestamp, readmode, TODAY)
+                  writetimestamp, readmode)
 
     # Exit
     sys.exit(0)
@@ -179,7 +179,7 @@ def writeTimestamp(entrypath, thisDatetime=datetime.datetime.today()):
 
 
 def openEntry(datetimeobj, editor, journalPath, dotimestamp, inreadmode,
-              istoday, errorstream=sys.stderr):
+              errorstream=sys.stderr):
     """Try opening a journal entry.
 
     Args:
@@ -190,8 +190,6 @@ def openEntry(datetimeobj, editor, journalPath, dotimestamp, inreadmode,
             directory.
         dotimestamp: A boolean signalling whether to append a timestamp
             to a journal entry before opening.
-        istoday: A boolean signalling whether to use the current
-            datetime for the timestamp.
         inreadmode: A boolean signalling whether to only open existing
             entries ("read mode").
         errorstream: An optional TextIO object to send error messages
@@ -214,11 +212,7 @@ def openEntry(datetimeobj, editor, journalPath, dotimestamp, inreadmode,
 
     # Append timestamp to journal entry if necessary
     if dotimestamp:
-        # Determine whether to use timestamp for *now*
-        if istoday:
-            writeTimestamp(entryPath)
-        else:
-            writeTimestamp(entryPath, datetimeobj)
+        writeTimestamp(entryPath)
 
     # Open the date's journal
     subprocess.Popen([editor, entryPath]).wait()
