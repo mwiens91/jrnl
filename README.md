@@ -4,12 +4,17 @@ A program to help manage a personal journal.
 
 ## Usage
 
+### Setup
+
 Set up your journal by printing out a config file, like so:
 
 ```
 jrnl --setup
 ```
+
 and fill out the path to the root of your journal.
+
+### Using jrnl
 
 Open up today's journal entry with
 
@@ -17,7 +22,22 @@ Open up today's journal entry with
 jrnl
 ```
 
-which will open up the appropriate journal entry in your favourite text editor.
+which will open up today's journal entry in your favourite text editor.
+
+### Using jrnl grep
+
+jrnl also comes with a grep wrapper which you can invoke as follows:
+
+```
+jrnl grep [OPTIONS] PATTERN
+```
+
+where `OPTIONS` are normal [grep
+options](http://man7.org/linux/man-pages/man1/grep.1.html).
+
+## Advanced usage
+
+### Timestamps
 
 You can generate a timestamp before opening the entry by using the `-t` flag:
 
@@ -25,25 +45,45 @@ You can generate a timestamp before opening the entry by using the `-t` flag:
 jrnl -t
 ```
 
-or you can have timestamps always written by specifying so in the config file.
+or you can have timestamps always written by specifying so in your config file.
 
-To open up yesterday's journal, or January 1 1999's journal, type
+### Negative date offsets
+
+You can open up additional dates' journals by specifying addional
+positional arguments. One way of doing this is with negative date
+offsets.  For example, to open up yesterday's journal run
 
 ```
 jrnl -1
-jrnl "January 1 1999"
 ```
 
-You can open up more than one date at once by giving more date
-arguments.
+### Fuzzy dates
 
-jrnl also comes with a wrapper for grep which you can invoke as follows:
+If you're specifying dates the usual way, jrnl uses
+[dateutil](https://github.com/dateutil/dateutil/)'s fuzzy date parser to
+parse the dates you pass in. This lets you specify dates like
 
 ```
-jrnl grep <pattern>
+jrnl "Nov 7 2017"
 ```
 
-## Other details
+dateutil can do much more, for example, specifying the 4th of the
+current month's date with
+
+```
+jrnl 4
+```
+
+### Extending a date past midnight
+
+When it's 02:00, we're likely to refer this time as night, rather than
+morning. Likewise, you might want a journal entry written at 02:00 to be
+in the same file as entries from (technically) the previous day. If you
+do want such a thing, you can specify how many hours past midnight you
+want to be considered as part of the previous day's journal file in the
+config settings.
+
+## Journal structure
 
 Right now you're constrained to having a journal structure like so:
 
