@@ -1,6 +1,6 @@
 # jrnl
 
-A program to help manage a personal journal.
+jrnl is a program to help manage a personal journal.
 
 ## Usage
 
