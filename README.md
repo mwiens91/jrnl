@@ -49,7 +49,7 @@ or you can have timestamps always written by specifying so in your config file.
 
 ### Negative date offsets
 
-You can open up additional dates' journals by specifying addional
+You can open up additional dates' journals by specifying additional
 positional arguments. One way of doing this is with negative date
 offsets.  For example, to open up yesterday's journal run
 
