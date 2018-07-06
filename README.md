@@ -49,9 +49,9 @@ or you can have timestamps always written by specifying so in your config file.
 
 ### Negative date offsets
 
-You can open up additional dates' journals by specifying additional
-positional arguments. One way of doing this is with negative date
-offsets.  For example, to open up yesterday's journal run
+You can open up another date's journal entry by specifying a date as an
+argument. One way of doing this is with negative date offsets: for
+example, to open up yesterday's journal run
 
 ```
 jrnl -1
@@ -59,29 +59,54 @@ jrnl -1
 
 ### Fuzzy dates
 
-If you're specifying dates the usual way, jrnl uses
+Another way to pass a date to jrnl is with a date string (wrapped in
+quotes if it contains spaces). jrnl uses
 [dateutil](https://github.com/dateutil/dateutil/)'s fuzzy date parser to
-parse the dates you pass in. This lets you specify dates like
+parse the strings you pass in, which lets you specify dates like ``"Nov
+7 2017"``:
 
 ```
 jrnl "Nov 7 2017"
 ```
 
-dateutil can do much more, for example, specifying the 4th of the
-current month's date with
+dateutil can do more: for example, specifying the 4th of the current
+month's date with
 
 ```
 jrnl 4
 ```
 
+### Opening multiple entries
+
+To open up multiple entries simply pass in multiple date arguments. For
+example,
+
+```
+jrnl -7 "Jan 01 2016" 20180504
+```
+
+will open entries for a week ago, 2018-01-01, and 2018-05-04.
+
 ### Extending a date past midnight
 
+If in your config file you have
+
+```yaml
+hours_past_midnight_included_in_date: N
+```
+
+where `N` is some postive integer; then for a given date, at 0`N`:00 or
+earlier, jrnl will open up the day before's journal entry.
+
+:confused: What? Here's the motivation:
+
 When it's 02:00, we're likely to refer this time as night, rather than
-morning. Likewise, you might want a journal entry written at 02:00 to be
-in the same file as entries from (technically) the previous day. If you
-do want such a thing, you can specify how many hours past midnight you
-want to be considered as part of the previous day's journal file in the
-config settings.
+morning. Likewise, you might want a journal chunk (for lack of a better
+term) written at 02:00 to be in the same entry as chunks from
+(technically) the previous day. If you do want such a thing, you can
+specify in your config file a time for dates before which (inclusive)
+jrnl will open up the day before's journal entry, as shown in the
+snippet above.
 
 ## Journal structure
 
