@@ -104,7 +104,7 @@ When it's 02:00, we're likely to refer this time as night, rather than
 morning. Likewise, you might want a journal chunk (for lack of a better
 term) written at 02:00 to be in the same entry as chunks from
 (technically) the previous day. If you do want such a thing, you can
-specify in your config file a time for dates before which (inclusive)
+specify a time in your config file. At any time before this specified time (inclusive),
 jrnl will open up the day before's journal entry, as shown in the
 snippet above.
 
