@@ -136,7 +136,7 @@ And more stuff here.
 ## How do I install this?
 
 ```
-pip3 install jrnl-mw
+sudo pip3 install jrnl-mw
 ```
 
-Run the above as root to get a nice `man` page with the program.
+or just run the `run_jrnl.py` script directly.
