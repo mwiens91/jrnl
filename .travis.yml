@@ -4,6 +4,7 @@ python:
   - "3.5"
   - "3.6"
 install:
+  - sudo apt-get install python3-setuptools
   - sudo python3 setup.py install
 script:
   jrnl
