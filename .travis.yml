@@ -3,3 +3,7 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
+install:
+  - sudo python3 setup.py install
+script:
+  jrnl
