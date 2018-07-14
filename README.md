@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/mwiens91/jrnl.svg?branch=master)](https://travis-ci.com/mwiens91/jrnl)
+
 # jrnl
 
 jrnl is a program to help manage a personal journal.
