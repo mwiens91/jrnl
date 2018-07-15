@@ -3,6 +3,11 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
+env:
+  # Just print out files instead of opening an editor session
+  - EDITOR=cat
 script:
-  - ./run_jrnl.py --help
-  - ./run_jrnl.py --version
+  # Test that basic functionality doesn't fail
+  - ./run_jrnl --setup > ~/.jrnlrc
+  - yes Y | ./run_jrnl
+  - ./run_jrnl grep test
