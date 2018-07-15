@@ -141,4 +141,4 @@ And more stuff here.
 sudo pip3 install jrnl-mw
 ```
 
-or just run the `run_jrnl.py` script directly.
+or just run the [`run_jrnl.py`](run_jrnl.py) script directly.
