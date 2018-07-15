@@ -27,13 +27,6 @@ def main():
         print("Config file invalid!", file=sys.stderr)
         sys.exit(1)
 
-    # Make sure journal root directory exists
-    if not os.path.isdir(configDict["journal_path"]):
-        if helpers.prompt("Create '" + configDict["journal_path"] + "'?"):
-            os.makedirs(configDict["journal_path"])
-        else:
-            sys.exit(0)
-
     # Use grep mode if requested
     try:
         if runtimeArgs.subparser_name == 'grep':
@@ -44,6 +37,13 @@ def main():
     except AttributeError:
         # Grep mode not requested
         pass
+
+    # Make sure journal root directory exists
+    if not os.path.isdir(configDict["journal_path"]):
+        if helpers.prompt("Create '" + configDict["journal_path"] + "'?"):
+            os.makedirs(configDict["journal_path"])
+        else:
+            sys.exit(0)
 
     # Figure out what editor to use
     if helpers.isProgramAvailable(configDict["editor"]):
