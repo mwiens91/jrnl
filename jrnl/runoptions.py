@@ -8,8 +8,22 @@ from jrnl import helpers
 from jrnl.version import DESCRIPTION, NAME, VERSION
 
 
-class ConfigException(Exception):
-    """An exception used when loading config fails."""
+# Contains the options which must be specified in config file
+CONFIG_KEYS = {
+    "editor",
+    "journal_path",
+    "hours_past_midnight_included_in_date",
+    "create_new_entries_when_specifying_dates",
+    "write_timestamps_by_default",}
+
+
+class ConfigNotFoundException(Exception):
+    """An exception used specified config doesn't exist."""
+    pass
+
+
+class ConfigInvalidException(Exception):
+    """An exception used specified config is invalid."""
     pass
 
 
@@ -133,8 +147,12 @@ def getConfig():
     $XDG_CONFIG_HOME/jrnl.conf
 
     Returns:
-        If a config setting can be found, returns a dictionary
-        containing config settings; otherwise returns None.
+        If a valid config file can be found, returns a dictionary
+        containing config settings.
+
+    Raises:
+        ConfigNotFoundException: A config file could not be found.
+        ConfigInvalidException: A config file was found to be invalid.
     """
     # Build list of possible config files
     possibleConfigs = [os.path.expanduser("~/.jrnlrc"),
@@ -148,12 +166,19 @@ def getConfig():
     for configpath in possibleConfigs:
         if os.path.isfile(configpath):
             with open(configpath, "r") as configfile:
+                # Try loading the config file
                 try:
-                    return yaml.load(configfile)
-                except yaml.YAMLError as exc:
-                    # Something bad happened
-                    print(exc, file=sys.stderr)
-                    break
+                    config_dict = yaml.load(configfile)
+                except yaml.YAMLError:
+                    # Bad config file
+                    raise ConfigInvalidException
+
+                # Verify the config file contains required options
+                if CONFIG_KEYS.issubset(set(config_dict.keys())):
+                    return config_dict
+                else:
+                    # Required option(s) not specified
+                    raise ConfigInvalidException
 
     # None of earlier config files checked out
-    raise ConfigException
+    raise ConfigNotFoundException

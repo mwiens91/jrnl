@@ -20,8 +20,11 @@ def main():
     # Open up config file
     try:
         configDict = runoptions.getConfig()
-    except runoptions.ConfigException:
+    except runoptions.ConfigNotFoundException:
         print("No config file found!", file=sys.stderr)
+        sys.exit(1)
+    except runoptions.ConfigInvalidException:
+        print("Config file invalid!", file=sys.stderr)
         sys.exit(1)
 
     # Make sure journal root directory exists
