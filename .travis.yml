@@ -8,6 +8,6 @@ env:
   - EDITOR=cat
 script:
   # Test that basic functionality doesn't fail
-  - ./run_jrnl --setup > ~/.jrnlrc
+  - ./run_jrnl --setup > $HOME/.jrnlrc
   - yes Y | ./run_jrnl
   - ./run_jrnl grep test
