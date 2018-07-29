@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.com/mwiens91/jrnl.svg?branch=master)](https://travis-ci.com/mwiens91/jrnl)
+[![PyPI](https://img.shields.io/pypi/v/jrnl-mw.svg)](https://pypi.org/project/jrnl-mw/)
 
 # jrnl
 
