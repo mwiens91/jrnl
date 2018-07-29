@@ -4,7 +4,7 @@ from jrnl.version import DESCRIPTION, PYPINAME, VERSION
 setup(
     name=PYPINAME,
     version=VERSION,
-    description=DESCRIPTION,
+    description=DESCRIPTION.capitalize(),
     url='https://github.com/mwiens91/jrnl',
     author='Matt Wiens',
     author_email='mwiens91@gmail.com',
