@@ -1,10 +1,17 @@
 from setuptools import setup
 from jrnl.version import DESCRIPTION, PYPINAME, VERSION
 
+
+# Parse readme to include in PyPI page
+with open('README.md') as f:
+    long_description = f.read()
+
 setup(
     name=PYPINAME,
     version=VERSION,
     description=DESCRIPTION.capitalize(),
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     url='https://github.com/mwiens91/jrnl',
     author='Matt Wiens',
     author_email='mwiens91@gmail.com',
