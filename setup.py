@@ -29,6 +29,7 @@ setup(
     entry_points={
         'console_scripts': ['jrnl = jrnl.jrnl:main'],
     },
+    python_requires='>=3',
     install_requires=[
         'python-dateutil',
         'PyYAML',
