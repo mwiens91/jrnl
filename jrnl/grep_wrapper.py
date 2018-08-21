@@ -1,6 +1,5 @@
 """Grep wrapper for jrnl."""
 
-import os
 import subprocess
 
 
