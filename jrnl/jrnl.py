@@ -80,8 +80,8 @@ def main():
 
                 # Create datetime object using offset from current day
                 dates.append(datetime.datetime.today()
-                                + datetime.timedelta(days=offset)
-                                + latenight_date_offset)
+                             + datetime.timedelta(days=offset)
+                             + latenight_date_offset)
             except ValueError:
                 try:
                     # Assume the date-string is a date, not an offset
@@ -102,8 +102,8 @@ def main():
 
     # Determine whether to write timestamp based on runtime args
     writetimestamp = (runtimeArgs.timestamp
-                        or (configDict["write_timestamps_by_default"]
-                                and not runtimeArgs.no_timestamp))
+                      or (configDict["write_timestamps_by_default"]
+                          and not runtimeArgs.no_timestamp))
 
     # Determine whether to only open existing files
     readmode = (bool(runtimeArgs.dates)

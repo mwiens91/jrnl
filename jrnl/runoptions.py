@@ -83,8 +83,8 @@ def parseRuntimeArguments():
 
     # Instantiate the parser
     parser = argparse.ArgumentParser(
-            prog=NAME,
-            description="%(prog)s - " + DESCRIPTION,)
+        prog=NAME,
+        description="%(prog)s - " + DESCRIPTION,)
 
     # Give subparser support if using grep
     if GIVE_GREP_PRIORITY:
@@ -92,42 +92,44 @@ def parseRuntimeArguments():
 
         # Add grep subcommand
         grep_parser = subparsers.add_parser(
-                "grep",
-                description=("%(prog)s - "
-                      "print lines from a time span matching a pattern."
-                      " Will accept all grep options (which are not "
-                      " listed here);"
-                      " see 'man grep' for more details."),
-                help=("print lines from a time span matching a pattern."
-                      " Will accept any grep options."))
+            "grep",
+            description=(
+                "%(prog)s - "
+                "print lines from a time span matching a pattern."
+                " Will accept all grep options (which are not "
+                " listed here);"
+                " see 'man grep' for more details."),
+            help=(
+                "print lines from a time span matching a pattern."
+                " Will accept any grep options."))
         grep_parser.add_argument(
-                "pattern",
-                help="search pattern",)
+            "pattern",
+            help="search pattern",)
     else:
         # Continue as normal
         parser.add_argument(
-                "dates",
-                help=("journal date(s) to open."
-                     " Defaults to right now."),
-                nargs="*",)
+            "dates",
+            help=("journal date(s) to open."
+                  " Defaults to right now."),
+            nargs="*",)
         parser.add_argument(
-                "--setup",
-                help="print configuration file and exit",
-                nargs=0,
-                action=PrintConfigAction,)
+            "--setup",
+            help="print configuration file and exit",
+            nargs=0,
+            action=PrintConfigAction,)
         parser.add_argument(
-                "--version",
-                action="version",
-                version="%(prog)s " + VERSION,)
+            "--version",
+            action="version",
+            version="%(prog)s " + VERSION,)
         timestamp_option = parser.add_mutually_exclusive_group()
         timestamp_option.add_argument(
-                "-t", "--timestamp",
-                help="write a timestamp before opening editor",
-                action="store_true",)
+            "-t", "--timestamp",
+            help="write a timestamp before opening editor",
+            action="store_true",)
         timestamp_option.add_argument(
-                "--no-timestamp",
-                help="don't write a timestamp before opening editor",
-                action="store_true",)
+            "--no-timestamp",
+            help="don't write a timestamp before opening editor",
+            action="store_true",)
 
     # This looks needlessly complicated, but it's necessary to pass in
     # arbitrary options into grep
