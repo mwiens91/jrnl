@@ -25,11 +25,16 @@ setup(
     author_email='mwiens91@gmail.com',
     license='MIT',
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: End Users/Desktop',
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         'Operating System :: Unix',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3 :: Only',
     ],
     data_files=[('/usr/local/man/man1', ['man/jrnl.1']),],
@@ -37,7 +42,7 @@ setup(
     entry_points={
         'console_scripts': ['jrnl = jrnl.jrnl:main'],
     },
-    python_requires='>=3',
+    python_requires='>=3.5',
     install_requires=[
         'python-dateutil',
         'PyYAML',

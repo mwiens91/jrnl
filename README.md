@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.com/mwiens91/jrnl.svg?branch=master)](https://travis-ci.com/mwiens91/jrnl)
 [![PyPI](https://img.shields.io/pypi/v/jrnl-mw.svg)](https://pypi.org/project/jrnl-mw/)
-![Python version](https://img.shields.io/badge/python-3-blue.svg)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/jrnl-mw.svg)](https://pypi.org/project/jrnl-mw/)
 
 
 # jrnl

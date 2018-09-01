@@ -2,5 +2,5 @@
 
 NAME = "jrnl"
 PYPINAME = "jrnl-mw"
-VERSION = "1.0.7"
+VERSION = "1.0.8"
 DESCRIPTION = "write a journal"
