@@ -17,7 +17,6 @@ def grep_wrapper(pattern, journal_root, extra_opts=None):
         extra_opts = []
 
     # Now grep - recursively and ignoring binary files
-    subprocess.Popen(['grep', '-r', '-I']
-                     + extra_opts
-                     + [pattern]
-                     + [journal_root]).wait()
+    subprocess.Popen(
+        ["grep", "-r", "-I"] + extra_opts + [pattern, journal_root]
+    ).wait()

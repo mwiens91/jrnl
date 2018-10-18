@@ -29,10 +29,12 @@ def main():
 
     # Use grep mode if requested
     try:
-        if runtimeArgs.subparser_name == 'grep':
-            grep_wrapper.grep_wrapper(runtimeArgs.pattern,
-                                      configDict["journal_path"],
-                                      extra_opts=runtimeArgs.options)
+        if runtimeArgs.subparser_name == "grep":
+            grep_wrapper.grep_wrapper(
+                runtimeArgs.pattern,
+                configDict["journal_path"],
+                extra_opts=runtimeArgs.options,
+            )
             sys.exit(0)
     except AttributeError:
         # Grep mode not requested
@@ -79,18 +81,23 @@ def main():
                     raise ValueError
 
                 # Create datetime object using offset from current day
-                dates.append(datetime.datetime.today()
-                             + datetime.timedelta(days=offset)
-                             + latenight_date_offset)
+                dates.append(
+                    datetime.datetime.today()
+                    + datetime.timedelta(days=offset)
+                    + latenight_date_offset
+                )
             except ValueError:
                 try:
                     # Assume the date-string is a date, not an offset
-                    dates.append(dateutil.parser.parse(datestring, fuzzy=True)
-                                 + latenight_date_offset)
+                    dates.append(
+                        dateutil.parser.parse(datestring, fuzzy=True)
+                        + latenight_date_offset
+                    )
                 except ValueError:
                     # The date given was not valid!
-                    print("%s is not a valid date!" % datestring,
-                          file=sys.stderr)
+                    print(
+                        "%s is not a valid date!" % datestring, file=sys.stderr
+                    )
 
         if not dates:
             # No valid dates given
@@ -101,18 +108,26 @@ def main():
         dates = [today + latenight_date_offset]
 
     # Determine whether to write timestamp based on runtime args
-    writetimestamp = (runtimeArgs.timestamp
-                      or (configDict["write_timestamps_by_default"]
-                          and not runtimeArgs.no_timestamp))
+    writetimestamp = runtimeArgs.timestamp or (
+        configDict["write_timestamps_by_default"]
+        and not runtimeArgs.no_timestamp
+    )
 
     # Determine whether to only open existing files
-    readmode = (bool(runtimeArgs.dates)
-                and not configDict["create_new_entries_when_specifying_dates"])
+    readmode = (
+        bool(runtimeArgs.dates)
+        and not configDict["create_new_entries_when_specifying_dates"]
+    )
 
     # Open journal entries corresponding to the current date
     for date in dates:
-        openEntry(date, editorName, configDict["journal_path"],
-                  writetimestamp, readmode)
+        openEntry(
+            date,
+            editorName,
+            configDict["journal_path"],
+            writetimestamp,
+            readmode,
+        )
 
     # Exit
     sys.exit(0)
@@ -142,13 +157,13 @@ def writeTimestamp(entrypath, thisDatetime=datetime.datetime.today()):
             today's date.
     """
     # Get strings for today's date and time
-    thisDate = thisDatetime.strftime('%Y-%m-%d')
+    thisDate = thisDatetime.strftime("%Y-%m-%d")
     thisTime = thisDatetime.strftime("%H:%M")
 
     # Check if journal entry already exists. If so write, the date and
     # time to it.
     if not os.path.isfile(entrypath):
-        with open(entrypath, 'x') as jrnlentry:
+        with open(entrypath, "x") as jrnlentry:
             jrnlentry.write(thisDate + "\n" + thisTime + "\n")
     else:
         # Find if date already written
@@ -166,14 +181,23 @@ def writeTimestamp(entrypath, thisDatetime=datetime.datetime.today()):
             printNewLine = True
 
         # Write to the file
-        with open(entrypath, 'a') as jrnlentry:
-            jrnlentry.write(printNewLine * "\n"
-                            + (thisDate + "\n") * printDate
-                            + thisTime + "\n\n")
+        with open(entrypath, "a") as jrnlentry:
+            jrnlentry.write(
+                printNewLine * "\n"
+                + (thisDate + "\n") * printDate
+                + thisTime
+                + "\n\n"
+            )
 
 
-def openEntry(datetimeobj, editor, journalPath, dotimestamp, inreadmode,
-              errorstream=sys.stderr):
+def openEntry(
+    datetimeobj,
+    editor,
+    journalPath,
+    dotimestamp,
+    inreadmode,
+    errorstream=sys.stderr,
+):
     """Try opening a journal entry.
 
     Args:
@@ -193,7 +217,9 @@ def openEntry(datetimeobj, editor, journalPath, dotimestamp, inreadmode,
 
     # Determine path the journal entry text file
     yearDirPath = os.path.join(journalPath, str(datetimeobj.year))
-    entryPath = os.path.join(yearDirPath, datetimeobj.strftime('%Y-%m-%d') + '.txt')
+    entryPath = os.path.join(
+        yearDirPath, datetimeobj.strftime("%Y-%m-%d") + ".txt"
+    )
 
     # If in read mode, only open existing entries
     if inreadmode and not os.path.exists(entryPath):

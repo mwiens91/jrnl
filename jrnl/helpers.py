@@ -30,9 +30,11 @@ def isProgramAvailable(programName):
     Returns:
         A boolean specifying whether the program specified is available.
     """
-    return not subprocess.Popen(["bash", "-c", "type " + programName],
-                                stdout=subprocess.DEVNULL,
-                                stderr=subprocess.DEVNULL).wait()
+    return not subprocess.Popen(
+        ["bash", "-c", "type " + programName],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    ).wait()
 
 
 def prompt(query):
