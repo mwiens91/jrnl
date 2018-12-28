@@ -7,30 +7,35 @@ import os
 import subprocess
 import sys
 import dateutil.parser
-from jrnl import grep_wrapper
-from jrnl import helpers
-from jrnl import run_options
+from .grep_wrapper import grep_wrapper
+from .helpers import is_program_available, prompt
+from .run_options import (
+    ConfigInvalidException,
+    ConfigNotFoundException,
+    get_config,
+    parse_runtime_arguments,
+)
 
 
 def main():
     """Main program for jrnl."""
     # Parse runtime options
-    runtime_args = run_options.parse_runtime_arguments()
+    runtime_args = parse_runtime_arguments()
 
     # Open up config file
     try:
-        config_dict = run_options.get_config()
-    except run_options.ConfigNotFoundException:
+        config_dict = get_config()
+    except ConfigNotFoundException:
         print("No config file found!", file=sys.stderr)
         sys.exit(1)
-    except run_options.ConfigInvalidException:
+    except ConfigInvalidException:
         print("Config file invalid!", file=sys.stderr)
         sys.exit(1)
 
     # Use grep mode if requested
     try:
         if runtime_args.subparser_name == "grep":
-            grep_wrapper.grep_wrapper(
+            grep_wrapper(
                 runtime_args.pattern,
                 config_dict["journal_path"],
                 extra_opts=runtime_args.options,
@@ -42,15 +47,15 @@ def main():
 
     # Make sure journal root directory exists
     if not os.path.isdir(config_dict["journal_path"]):
-        if helpers.prompt("Create '" + config_dict["journal_path"] + "'?"):
+        if prompt("Create '" + config_dict["journal_path"] + "'?"):
             os.makedirs(config_dict["journal_path"])
         else:
             sys.exit(0)
 
     # Figure out what editor to use
-    if helpers.is_program_available(config_dict["editor"]):
+    if is_program_available(config_dict["editor"]):
         editor_name = config_dict["editor"]
-    elif helpers.is_program_available("sensible-editor"):
+    elif is_program_available("sensible-editor"):
         editor_name = "sensible-editor"
     else:
         print(config_dict["editor"] + " not available!", file=sys.stderr)

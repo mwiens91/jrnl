@@ -1,9 +1,8 @@
 """Contains a few helper functions."""
 
-import distutils.util
+from distutils.util import strtobool
 import os
 import subprocess
-import sys
 
 
 def get_user_editor():
@@ -54,7 +53,7 @@ def prompt(query):
     print("%s [y/n]: " % query)
     val = input().lower()
     try:
-        result = distutils.util.strtobool(val)
+        result = strtobool(val)
     except ValueError:
         # Result no good! Ask again.
         print("Please answer with y/n")

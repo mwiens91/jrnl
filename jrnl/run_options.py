@@ -4,8 +4,8 @@ import argparse
 import os
 import sys
 import yaml
-from jrnl import helpers
-from jrnl.version import DESCRIPTION, NAME, VERSION
+from .helpers import get_user_editor
+from .version import DESCRIPTION, NAME, VERSION
 
 
 # Contains the options which must be specified in config file
@@ -36,7 +36,7 @@ class PrintConfigAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         # Build configuration file
         confdict = dict()
-        confdict["editor"] = helpers.get_user_editor()
+        confdict["editor"] = get_user_editor()
         confdict["journal_path"] = os.path.expanduser("~/path/to/journal")
         confdict["hours_past_midnight_included_in_date"] = 4
         confdict["create_new_entries_when_specifying_dates"] = False
