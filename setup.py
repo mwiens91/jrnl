@@ -41,7 +41,7 @@ setup(
     ],
     data_files=[("/usr/local/man/man1", ["man/jrnl.1"])],
     packages=["jrnl"],
-    entry_points={"console_scripts": ["jrnl = jrnl.jrnl:main"]},
+    entry_points={"console_scripts": ["jrnl = jrnl.main:main"]},
     python_requires=">=3.5",
     install_requires=["python-dateutil", "PyYAML"],
 )
