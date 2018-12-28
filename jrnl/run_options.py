@@ -77,7 +77,8 @@ def parse_runtime_arguments():
     # A function to add subparser support
     def add_subparsers(parser_):
         """Add subparser support for sub-commands.
-        Arg:
+
+        Args:
             parser_: An argparse.ArgumentParser
 
         Returns:

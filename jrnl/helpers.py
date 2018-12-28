@@ -25,8 +25,9 @@ def is_program_available(program_name):
     sense this is not "safe", but for the scope of this program, this
     approach is fine.
 
-    Arg:
+    Args:
         program_name: A string containing a program name.
+
     Returns:
         A boolean specifying whether the program specified is available.
     """
@@ -44,8 +45,9 @@ def prompt(query):
     Credit goes to Matt Stevenson. See:
     http://mattoc.com/python-yes-no-prompt-cli.html
 
-    Arg:
+    Args:
         query: A string containing a question.
+
     Returns:
         A boolean corresponding to the answer to the question asked.
     """
