@@ -188,9 +188,9 @@ def getConfig():
                 # Verify the config file contains required options
                 if CONFIG_KEYS.issubset(set(config_dict.keys())):
                     return config_dict
-                else:
-                    # Required option(s) not specified
-                    raise ConfigInvalidException
+
+                # Required option(s) not specified
+                raise ConfigInvalidException
 
     # None of earlier config files checked out
     raise ConfigNotFoundException
