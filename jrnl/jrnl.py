@@ -9,31 +9,31 @@ import sys
 import dateutil.parser
 from jrnl import grep_wrapper
 from jrnl import helpers
-from jrnl import runoptions
+from jrnl import run_options
 
 
 def main():
     """Main program for jrnl."""
     # Parse runtime options
-    runtimeArgs = runoptions.parseRuntimeArguments()
+    runtime_args = run_options.parse_runtime_arguments()
 
     # Open up config file
     try:
-        configDict = runoptions.getConfig()
-    except runoptions.ConfigNotFoundException:
+        config_dict = run_options.get_config()
+    except run_options.ConfigNotFoundException:
         print("No config file found!", file=sys.stderr)
         sys.exit(1)
-    except runoptions.ConfigInvalidException:
+    except run_options.ConfigInvalidException:
         print("Config file invalid!", file=sys.stderr)
         sys.exit(1)
 
     # Use grep mode if requested
     try:
-        if runtimeArgs.subparser_name == "grep":
+        if runtime_args.subparser_name == "grep":
             grep_wrapper.grep_wrapper(
-                runtimeArgs.pattern,
-                configDict["journal_path"],
-                extra_opts=runtimeArgs.options,
+                runtime_args.pattern,
+                config_dict["journal_path"],
+                extra_opts=runtime_args.options,
             )
             sys.exit(0)
     except AttributeError:
@@ -41,36 +41,36 @@ def main():
         pass
 
     # Make sure journal root directory exists
-    if not os.path.isdir(configDict["journal_path"]):
-        if helpers.prompt("Create '" + configDict["journal_path"] + "'?"):
-            os.makedirs(configDict["journal_path"])
+    if not os.path.isdir(config_dict["journal_path"]):
+        if helpers.prompt("Create '" + config_dict["journal_path"] + "'?"):
+            os.makedirs(config_dict["journal_path"])
         else:
             sys.exit(0)
 
     # Figure out what editor to use
-    if helpers.isProgramAvailable(configDict["editor"]):
-        editorName = configDict["editor"]
-    elif helpers.isProgramAvailable("sensible-editor"):
-        editorName = "sensible-editor"
+    if helpers.is_program_available(config_dict["editor"]):
+        editor_name = config_dict["editor"]
+    elif helpers.is_program_available("sensible-editor"):
+        editor_name = "sensible-editor"
     else:
-        print(configDict["editor"] + " not available!", file=sys.stderr)
+        print(config_dict["editor"] + " not available!", file=sys.stderr)
         sys.exit(1)
 
     # Get today's datetime
     today = datetime.datetime.today()
 
     # Respect the "hours past midnight included in date" setting
-    if today.hour < configDict["hours_past_midnight_included_in_date"]:
+    if today.hour < config_dict["hours_past_midnight_included_in_date"]:
         latenight_date_offset = datetime.timedelta(days=-1)
     else:
         latenight_date_offset = datetime.timedelta()
 
     # Build datetime objects for the relevant dates
-    if runtimeArgs.dates:
+    if runtime_args.dates:
         # Parse dates given in runtime argument
         dates = []
 
-        for datestring in runtimeArgs.dates:
+        for datestring in runtime_args.dates:
             try:
                 # Check for negative offsetting first
                 offset = int(datestring)
@@ -108,23 +108,23 @@ def main():
         dates = [today + latenight_date_offset]
 
     # Determine whether to write timestamp based on runtime args
-    writetimestamp = runtimeArgs.timestamp or (
-        configDict["write_timestamps_by_default"]
-        and not runtimeArgs.no_timestamp
+    writetimestamp = runtime_args.timestamp or (
+        config_dict["write_timestamps_by_default"]
+        and not runtime_args.no_timestamp
     )
 
     # Determine whether to only open existing files
     readmode = (
-        bool(runtimeArgs.dates)
-        and not configDict["create_new_entries_when_specifying_dates"]
+        bool(runtime_args.dates)
+        and not config_dict["create_new_entries_when_specifying_dates"]
     )
 
     # Open journal entries corresponding to the current date
     for date in dates:
-        openEntry(
+        open_entry(
             date,
-            editorName,
-            configDict["journal_path"],
+            editor_name,
+            config_dict["journal_path"],
             writetimestamp,
             readmode,
         )
@@ -133,7 +133,7 @@ def main():
     sys.exit(0)
 
 
-def writeTimestamp(entrypath, thisDatetime=datetime.datetime.today()):
+def write_timestamp(entry_path, this_datetime=datetime.datetime.today()):
     """Write timestamp to journal entry, if one doesn't already exist.
 
     Modifies a text file to include the passed in datetime's time and
@@ -151,88 +151,88 @@ def writeTimestamp(entrypath, thisDatetime=datetime.datetime.today()):
         only the time.
 
     Args:
-        entrypath: A string containing a path to a journal entry,
+        entry_path: A string containing a path to a journal entry,
             already created or not.
-        thisDatetime: An optional datetime.datetime object representing
+        this_datetime: An optional datetime.datetime object representing
             today's date.
     """
     # Get strings for today's date and time
-    thisDate = thisDatetime.strftime("%Y-%m-%d")
-    thisTime = thisDatetime.strftime("%H:%M")
+    this_date = this_datetime.strftime("%Y-%m-%d")
+    this_time = this_datetime.strftime("%H:%M")
 
     # Check if journal entry already exists. If so write, the date and
     # time to it.
-    if not os.path.isfile(entrypath):
-        with open(entrypath, "x") as jrnlentry:
-            jrnlentry.write(thisDate + "\n" + thisTime + "\n")
+    if not os.path.isfile(entry_path):
+        with open(entry_path, "x") as jrnl_entry:
+            jrnl_entry.write(this_date + "\n" + this_time + "\n")
     else:
         # Find if date already written
-        entrytext = open(entrypath).read()
+        entry_text = open(entry_path).read()
 
-        if thisDate in entrytext:
-            printDate = False
+        if this_date in entry_text:
+            print_date = False
         else:
-            printDate = True
+            print_date = True
 
         # Find if we need to insert a newline at the bottom of the file
-        if entrytext.endswith("\n\n"):
-            printNewLine = False
+        if entry_text.endswith("\n\n"):
+            print_newline = False
         else:
-            printNewLine = True
+            print_newline = True
 
         # Write to the file
-        with open(entrypath, "a") as jrnlentry:
-            jrnlentry.write(
-                printNewLine * "\n"
-                + (thisDate + "\n") * printDate
-                + thisTime
+        with open(entry_path, "a") as jrnl_entry:
+            jrnl_entry.write(
+                print_newline * "\n"
+                + (this_date + "\n") * print_date
+                + this_time
                 + "\n\n"
             )
 
 
-def openEntry(
-    datetimeobj,
+def open_entry(
+    datetime_obj,
     editor,
-    journalPath,
-    dotimestamp,
-    inreadmode,
-    errorstream=sys.stderr,
+    journal_path,
+    do_timestamp,
+    in_read_mode,
+    error_stream=sys.stderr,
 ):
     """Try opening a journal entry.
 
     Args:
-        datetimeobj: A datetime.datetime object containing which day's
+        datetime_obj: A datetime.datetime object containing which day's
             journal entry to open.
         editor: A string containing the name of the editor to use.
-        journalPath: A string containing the path to the journal's base
+        journal_path: A string containing the path to the journal's base
             directory.
-        dotimestamp: A boolean signalling whether to append a timestamp
+        do_timestamp: A boolean signalling whether to append a timestamp
             to a journal entry before opening.
-        inreadmode: A boolean signalling whether to only open existing
+        in_read_mode: A boolean signalling whether to only open existing
             entries ("read mode").
-        errorstream: An optional TextIO object to send error messages
-            to. Almost certainly you want to use the default standard
-            error output.
+        error_stream: An optional TextIO object to send error messages
+            to. Almost certainly you want to use the default standard error
+            output.
     """
 
     # Determine path the journal entry text file
-    yearDirPath = os.path.join(journalPath, str(datetimeobj.year))
-    entryPath = os.path.join(
-        yearDirPath, datetimeobj.strftime("%Y-%m-%d") + ".txt"
+    year_dir_path = os.path.join(journal_path, str(datetime_obj.year))
+    entry_path = os.path.join(
+        year_dir_path, datetime_obj.strftime("%Y-%m-%d") + ".txt"
     )
 
     # If in read mode, only open existing entries
-    if inreadmode and not os.path.exists(entryPath):
-        print("%s does not exist!" % entryPath, file=errorstream)
+    if in_read_mode and not os.path.exists(entry_path):
+        print("%s does not exist!" % entry_path, file=error_stream)
         return
 
     # Make the year directory if necessary
-    if not os.path.isdir(yearDirPath):
-        os.makedirs(yearDirPath)
+    if not os.path.isdir(year_dir_path):
+        os.makedirs(year_dir_path)
 
     # Append timestamp to journal entry if necessary
-    if dotimestamp:
-        writeTimestamp(entryPath)
+    if do_timestamp:
+        write_timestamp(entry_path)
 
     # Open the date's journal
-    subprocess.Popen([editor, entryPath]).wait()
+    subprocess.Popen([editor, entry_path]).wait()

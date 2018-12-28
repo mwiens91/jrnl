@@ -36,7 +36,7 @@ class PrintConfigAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         # Build configuration file
         confdict = dict()
-        confdict["editor"] = helpers.getUserEditor()
+        confdict["editor"] = helpers.get_user_editor()
         confdict["journal_path"] = os.path.expanduser("~/path/to/journal")
         confdict["hours_past_midnight_included_in_date"] = 4
         confdict["create_new_entries_when_specifying_dates"] = False
@@ -59,7 +59,7 @@ class PrintConfigAction(argparse.Action):
         sys.exit(0)
 
 
-def parseRuntimeArguments():
+def parse_runtime_arguments():
     """Parse runtime arguments using argparse.
 
     This will generally return runtime arguments as attributes, though
@@ -75,7 +75,7 @@ def parseRuntimeArguments():
     GIVE_GREP_PRIORITY = bool(len(sys.argv) > 1 and sys.argv[1] == "grep")
 
     # A function to add subparser support
-    def addSubParsers(parser_):
+    def add_subparsers(parser_):
         """Add subparser support for sub-commands.
         Arg:
             parser_: An argparse.ArgumentParser
@@ -92,7 +92,7 @@ def parseRuntimeArguments():
 
     # Give subparser support if using grep
     if GIVE_GREP_PRIORITY:
-        subparsers = addSubParsers(parser)
+        subparsers = add_subparsers(parser)
 
         # Add grep subcommand
         grep_parser = subparsers.add_parser(
@@ -147,7 +147,7 @@ def parseRuntimeArguments():
     return namespace
 
 
-def getConfig():
+def get_config():
     """Find and return config settings dictionary.
 
     Looks for config files located at
@@ -165,22 +165,22 @@ def getConfig():
         ConfigInvalidException: A config file was found to be invalid.
     """
     # Build list of possible config files
-    possibleConfigs = [
+    possible_configs = [
         os.path.expanduser("~/.jrnlrc"),
         os.path.expanduser("~/.config/jrnl.conf"),
     ]
 
     # Also look in XDG dirs, provided they exist
     if os.environ.get("XDG_CONFIG_HOME"):
-        possibleConfigs += [os.environ.get("XDG_CONFIG_HOME") + "/jrnl.conf"]
+        possible_configs += [os.environ.get("XDG_CONFIG_HOME") + "/jrnl.conf"]
 
     # Iterate through all possible config files
-    for configpath in possibleConfigs:
-        if os.path.isfile(configpath):
-            with open(configpath, "r") as configfile:
+    for config_path in possible_configs:
+        if os.path.isfile(config_path):
+            with open(config_path, "r") as config_file:
                 # Try loading the config file
                 try:
-                    config_dict = yaml.load(configfile)
+                    config_dict = yaml.load(config_file)
                 except yaml.YAMLError:
                     # Bad config file
                     raise ConfigInvalidException
