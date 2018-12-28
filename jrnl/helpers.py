@@ -49,12 +49,12 @@ def prompt(query):
     Returns:
         A boolean corresponding to the answer to the question asked.
     """
-    sys.stdout.write("%s [y/n]: " % query)
+    print("%s [y/n]: " % query)
     val = input().lower()
     try:
         result = distutils.util.strtobool(val)
     except ValueError:
         # Result no good! Ask again.
-        sys.stdout.write("Please answer with y/n\n")
+        print("Please answer with y/n")
         return prompt(query)
     return result
