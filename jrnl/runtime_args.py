@@ -4,6 +4,13 @@ import argparse
 import os
 import sys
 import yaml
+from .constants import (
+    EDITOR,
+    JOURNAL_PATH,
+    HOURS_PAST_MIDNIGHT_INCLUDED_IN_DATE,
+    CREATE_NEW_ENTRIES_WHEN_SPECIFYING_DATES,
+    WRITE_TIMESTAMPS_BY_DEFAULT,
+)
 from .helpers import get_user_editor
 from .version import DESCRIPTION, NAME, VERSION
 
@@ -14,18 +21,20 @@ class PrintConfigAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         # Build configuration file
         confdict = dict()
-        confdict["editor"] = get_user_editor()
-        confdict["journal_path"] = os.path.expanduser("~/path/to/journal")
-        confdict["hours_past_midnight_included_in_date"] = 4
-        confdict["create_new_entries_when_specifying_dates"] = False
-        confdict["write_timestamps_by_default"] = True
+        confdict[EDITOR] = get_user_editor()
+        confdict[JOURNAL_PATH] = os.path.expanduser("~/path/to/journal")
+        confdict[HOURS_PAST_MIDNIGHT_INCLUDED_IN_DATE] = 4
+        confdict[CREATE_NEW_ENTRIES_WHEN_SPECIFYING_DATES] = False
+        confdict[WRITE_TIMESTAMPS_BY_DEFAULT] = True
 
         # Print configuration file
         print("# jrnl config file")
         print("# Save this configuration file in any of the following:")
         print("# ~/.jrnlrc\t~/.config/jrnl.conf\t$XDG_CONFIG_HOME/jrnl.conf")
         print("#")
-        print("# 'hours_past_midnight_included_in_date' is the number of")
+        print(
+            "# '" + HOURS_PAST_MIDNIGHT_INCLUDED_IN_DATE + "' is the number of"
+        )
         print("# hours into the next date a date's journal entries should")
         print("# cover. Example: say this setting is set to 4. Then if it")
         print("# was 03:00 on 2018-03-03, jrnl would open up 2018-03-02's")

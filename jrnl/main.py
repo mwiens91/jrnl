@@ -5,6 +5,13 @@ import os
 import sys
 import dateutil.parser
 from .config import ConfigInvalidException, ConfigNotFoundException, get_config
+from .constants import (
+    EDITOR,
+    JOURNAL_PATH,
+    HOURS_PAST_MIDNIGHT_INCLUDED_IN_DATE,
+    CREATE_NEW_ENTRIES_WHEN_SPECIFYING_DATES,
+    WRITE_TIMESTAMPS_BY_DEFAULT,
+)
 from .grep_wrapper import grep_wrapper
 from .helpers import is_program_available, prompt
 from .journal import open_entry
@@ -31,7 +38,7 @@ def main():
         if runtime_args.subparser_name == "grep":
             grep_wrapper(
                 runtime_args.pattern,
-                config_dict["journal_path"],
+                config_dict[JOURNAL_PATH],
                 extra_opts=runtime_args.options,
             )
             sys.exit(0)
@@ -40,26 +47,26 @@ def main():
         pass
 
     # Make sure journal root directory exists
-    if not os.path.isdir(config_dict["journal_path"]):
-        if prompt("Create '" + config_dict["journal_path"] + "'?"):
-            os.makedirs(config_dict["journal_path"])
+    if not os.path.isdir(config_dict[JOURNAL_PATH]):
+        if prompt("Create '" + config_dict[JOURNAL_PATH] + "'?"):
+            os.makedirs(config_dict[JOURNAL_PATH])
         else:
             sys.exit(0)
 
     # Figure out what editor to use
-    if is_program_available(config_dict["editor"]):
-        editor_name = config_dict["editor"]
+    if is_program_available(config_dict[EDITOR]):
+        editor_name = config_dict[EDITOR]
     elif is_program_available("sensible-editor"):
         editor_name = "sensible-editor"
     else:
-        print(config_dict["editor"] + " not available!", file=sys.stderr)
+        print(config_dict[EDITOR] + " not available!", file=sys.stderr)
         sys.exit(1)
 
     # Get today's datetime
     today = datetime.datetime.today()
 
     # Respect the "hours past midnight included in date" setting
-    if today.hour < config_dict["hours_past_midnight_included_in_date"]:
+    if today.hour < config_dict[HOURS_PAST_MIDNIGHT_INCLUDED_IN_DATE]:
         latenight_date_offset = datetime.timedelta(days=-1)
     else:
         latenight_date_offset = datetime.timedelta()
@@ -108,14 +115,14 @@ def main():
 
     # Determine whether to write timestamp based on runtime args
     writetimestamp = runtime_args.timestamp or (
-        config_dict["write_timestamps_by_default"]
+        config_dict[WRITE_TIMESTAMPS_BY_DEFAULT]
         and not runtime_args.no_timestamp
     )
 
     # Determine whether to only open existing files
     readmode = (
         bool(runtime_args.dates)
-        and not config_dict["create_new_entries_when_specifying_dates"]
+        and not config_dict[CREATE_NEW_ENTRIES_WHEN_SPECIFYING_DATES]
     )
 
     # Open journal entries corresponding to the current date
@@ -123,7 +130,7 @@ def main():
         open_entry(
             date,
             editor_name,
-            config_dict["journal_path"],
+            config_dict[JOURNAL_PATH],
             writetimestamp,
             readmode,
         )
