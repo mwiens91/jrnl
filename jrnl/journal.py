@@ -44,7 +44,6 @@ def parse_dates(date_args, late_night_date_offset):
                 # Assume the date-string is a date, not an offset
                 parsed_dates.append(
                     dateutil.parser.parse(date_string, fuzzy=True)
-                    + late_night_date_offset
                 )
             except ValueError:
                 # The date given was not valid!
