@@ -4,6 +4,55 @@ import datetime
 import os
 import subprocess
 import sys
+import dateutil.parser
+
+
+def parse_dates(date_args, late_night_date_offset):
+    """Parse dates given in runtime arguments.
+
+    Args:
+        date_args: A list of strings containing date arguments to be
+            parsed
+        late_night_date_offset: A datetime.timedelta specifying how many
+            hours to adjust each date.
+
+    Returns:
+        A list of datetime.datetimes representing the journal dates to
+        open.
+    """
+    # Parse dates given in runtime argument
+    parsed_dates = []
+
+    for date_string in date_args:
+        try:
+            # Check for negative offsetting first
+            offset = int(date_string)
+
+            if offset > 0:
+                # Don't allow offseting from the future. Check if
+                # the argument passed in is a date instead
+                raise ValueError
+
+            # Create datetime object using offset from current day
+            parsed_dates.append(
+                datetime.datetime.today()
+                + datetime.timedelta(days=offset)
+                + late_night_date_offset
+            )
+        except ValueError:
+            try:
+                # Assume the date-string is a date, not an offset
+                parsed_dates.append(
+                    dateutil.parser.parse(date_string, fuzzy=True)
+                    + late_night_date_offset
+                )
+            except ValueError:
+                # The date given was not valid!
+                print(
+                    "%s is not a valid date!" % date_string, file=sys.stderr
+                )
+
+    return parsed_dates
 
 
 def write_timestamp(entry_path, this_datetime=datetime.datetime.today()):

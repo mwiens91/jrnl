@@ -3,7 +3,6 @@
 import datetime
 import os
 import sys
-import dateutil.parser
 from .config import ConfigInvalidException, ConfigNotFoundException, get_config
 from .constants import (
     EDITOR,
@@ -14,7 +13,7 @@ from .constants import (
 )
 from .grep_wrapper import grep_wrapper
 from .helpers import is_program_available, prompt
-from .journal import open_entry
+from .journal import open_entry, parse_dates
 from .runtime_args import parse_runtime_arguments
 
 
@@ -74,36 +73,7 @@ def main():
     # Build datetime objects for the relevant dates
     if runtime_args.dates:
         # Parse dates given in runtime argument
-        dates = []
-
-        for datestring in runtime_args.dates:
-            try:
-                # Check for negative offsetting first
-                offset = int(datestring)
-
-                if offset > 0:
-                    # Don't allow offseting from the future. Check if
-                    # the argument passed in is a date instead
-                    raise ValueError
-
-                # Create datetime object using offset from current day
-                dates.append(
-                    datetime.datetime.today()
-                    + datetime.timedelta(days=offset)
-                    + latenight_date_offset
-                )
-            except ValueError:
-                try:
-                    # Assume the date-string is a date, not an offset
-                    dates.append(
-                        dateutil.parser.parse(datestring, fuzzy=True)
-                        + latenight_date_offset
-                    )
-                except ValueError:
-                    # The date given was not valid!
-                    print(
-                        "%s is not a valid date!" % datestring, file=sys.stderr
-                    )
+        dates = parse_dates(runtime_args.dates, latenight_date_offset)
 
         if not dates:
             # No valid dates given
