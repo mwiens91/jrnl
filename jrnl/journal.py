@@ -48,9 +48,7 @@ def parse_dates(date_args, late_night_date_offset):
                 )
             except ValueError:
                 # The date given was not valid!
-                print(
-                    "%s is not a valid date!" % date_string, file=sys.stderr
-                )
+                print("%s is not a valid date!" % date_string, file=sys.stderr)
 
     return parsed_dates
 
