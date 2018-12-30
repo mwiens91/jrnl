@@ -12,13 +12,12 @@ def parse_dates(date_args, late_night_date_offset):
 
     Args:
         date_args: A list of strings containing date arguments to be
-            parsed
-        late_night_date_offset: A datetime.timedelta specifying how many
-            hours to adjust each date.
+            parsed.
+        late_night_date_offset: A datetime.timedelta specifying whether
+            to shift the raw date back a day.
 
     Returns:
-        A list of datetime.datetimes representing the journal dates to
-        open.
+        A list of datetime.dates representing the journal dates to open.
     """
     # Parse dates given in runtime argument
     parsed_dates = []
@@ -29,13 +28,13 @@ def parse_dates(date_args, late_night_date_offset):
             offset = int(date_string)
 
             if offset > 0:
-                # Don't allow offseting from the future. Check if
-                # the argument passed in is a date instead
+                # Don't allow offseting from the future. Check if the
+                # argument passed in is a date instead
                 raise ValueError
 
             # Create datetime object using offset from current day
             parsed_dates.append(
-                datetime.datetime.today()
+                datetime.date.today()
                 + datetime.timedelta(days=offset)
                 + late_night_date_offset
             )
@@ -43,7 +42,7 @@ def parse_dates(date_args, late_night_date_offset):
             try:
                 # Assume the date-string is a date, not an offset
                 parsed_dates.append(
-                    dateutil.parser.parse(date_string, fuzzy=True)
+                    dateutil.parser.parse(date_string, fuzzy=True).date()
                 )
             except ValueError:
                 # The date given was not valid!
@@ -65,15 +64,15 @@ def write_timestamp(entry_path, this_datetime=datetime.datetime.today()):
         the datetime's date is already written.  If the datetime's date
         is not written, append the date and time to the file, ensuring
         at least one empty line between the date and time and whatever
-        text came before it.  If the datetime's date *is* written,
-        follow the same steps as but omit writing the date; i.e., write
-        only the time.
+        text came before it. If the datetime's date *is* written, follow
+        the same steps as but omit writing the date; i.e., write only
+        the time.
 
     Args:
         entry_path: A string containing a path to a journal entry,
             already created or not.
         this_datetime: An optional datetime.datetime object representing
-            today's date.
+            the time to write a timestamp for.
     """
     # Get strings for today's date and time
     this_date = this_datetime.strftime("%Y-%m-%d")
@@ -110,7 +109,7 @@ def write_timestamp(entry_path, this_datetime=datetime.datetime.today()):
 
 
 def open_entry(
-    datetime_obj,
+    date,
     editor,
     journal_path,
     do_timestamp,
@@ -120,8 +119,8 @@ def open_entry(
     """Try opening a journal entry.
 
     Args:
-        datetime_obj: A datetime.datetime object containing which day's
-            journal entry to open.
+        date: A datetime.date object containing which day's journal
+            entry to open.
         editor: A string containing the name of the editor to use.
         journal_path: A string containing the path to the journal's base
             directory.
@@ -135,9 +134,9 @@ def open_entry(
     """
 
     # Determine path the journal entry text file
-    year_dir_path = os.path.join(journal_path, str(datetime_obj.year))
+    year_dir_path = os.path.join(journal_path, str(date.year))
     entry_path = os.path.join(
-        year_dir_path, datetime_obj.strftime("%Y-%m-%d") + ".txt"
+        year_dir_path, date.strftime("%Y-%m-%d") + ".txt"
     )
 
     # If in read mode, only open existing entries
@@ -149,7 +148,7 @@ def open_entry(
     if not os.path.isdir(year_dir_path):
         os.makedirs(year_dir_path)
 
-    # Append timestamp to journal entry if necessary
+    # Append *right now*'s timestamp to journal entry if specified
     if do_timestamp:
         write_timestamp(entry_path)
 

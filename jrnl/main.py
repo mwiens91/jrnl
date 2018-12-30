@@ -70,7 +70,7 @@ def main():
     else:
         latenight_date_offset = datetime.timedelta()
 
-    # Build datetime objects for the relevant dates
+    # Build datetime.date objects for the relevant dates
     if runtime_args.dates:
         # Parse dates given in runtime argument
         dates = parse_dates(runtime_args.dates, latenight_date_offset)
@@ -81,7 +81,7 @@ def main():
             sys.exit(1)
     else:
         # Use settings applicable when not specifying date
-        dates = [today + latenight_date_offset]
+        dates = [today.date() + latenight_date_offset]
 
     # Determine whether to write timestamp based on runtime args
     write_timestamp = runtime_args.timestamp or (
