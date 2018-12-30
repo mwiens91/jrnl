@@ -73,7 +73,11 @@ def main():
     # Build datetime.date objects for the relevant dates
     if runtime_args.dates:
         # Parse dates given in runtime argument
-        dates = parse_dates(runtime_args.dates, latenight_date_offset)
+        dates = parse_dates(
+            runtime_args.dates,
+            latenight_date_offset,
+            config_dict[JOURNAL_PATH],
+        )
 
         if not dates:
             # No valid dates given

@@ -2,12 +2,101 @@
 
 import datetime
 import os
+import re
 import subprocess
 import sys
 import dateutil.parser
 
 
-def parse_dates(date_args, late_night_date_offset):
+class JournalNotFoundException(Exception):
+    """A general exception used when a journal entry can't be found."""
+
+    pass
+
+
+class JournalHeadNotFoundException(JournalNotFoundException):
+    """An exception used when no journal head can be found."""
+
+    pass
+
+
+def get_existing_year_directories(journal_path):
+    """Get year strings for existing years in journal.
+
+    The years are returned in ascending order.
+
+    Args:
+        journal_path: A string containing the path to the journal's base
+            directory.
+
+    Returns:
+        A list of strings containing years for which there are year
+        directories in the journal's base directory.
+    """
+    return sorted(
+        [y for y in os.listdir(journal_path) if re.match(r"\d{4}", y)]
+    )
+
+
+def get_years_existing_entry_dates(year, journal_path):
+    """Get dates for all existing journal entries within a given year.
+
+    The dates are returned in ascending order.
+
+    Args:
+        year: An string specifying the year to get journal entries for.
+        journal_path: A string containing the path to the journal's base
+            directory.
+
+    Returns:
+        A list of datetime.dates corresponsing to dates for which there
+        are existing journal entries.
+    """
+    # Get all file names
+    year_dir_path = os.path.join(journal_path, year)
+    file_names = os.listdir(year_dir_path)
+
+    # Filter for valid dates
+    date_strings = [
+        d[:-4] for d in file_names if re.match(r"\d{4}-\d{2}-\d{2}.txt", d)
+    ]
+
+    # Build date objects for the dates
+    dates = [
+        datetime.datetime.strptime(d, "%Y-%m-%d").date() for d in date_strings
+    ]
+
+    return sorted(dates)
+
+
+def find_lastest_existing_entry(journal_path):
+    """Find the latest existing journal entry's date.
+
+    Args:
+        journal_path: A string containing the path to the journal's base
+            directory.
+
+    Returns:
+        A datetime.date specifying the date corresponding to the latest
+        journal entry.
+
+    Raises:
+        JournalHeadNotFoundException: The latest journal couldn't be found.
+    """
+    # Iterate through existing years until we find an existing journal
+    existing_years = get_existing_year_directories(journal_path)
+
+    for year in existing_years[::-1]:
+        year_dates = get_years_existing_entry_dates(year, journal_path)
+
+        if year_dates:
+            return year_dates[-1]
+
+    # No journal head found
+    raise JournalHeadNotFoundException
+
+
+def parse_dates(date_args, late_night_date_offset, journal_path):
     """Parse dates given in runtime arguments.
 
     Args:
@@ -15,6 +104,8 @@ def parse_dates(date_args, late_night_date_offset):
             parsed.
         late_night_date_offset: A datetime.timedelta specifying whether
             to shift the raw date back a day.
+        journal_path: A string containing the path to the journal's base
+            directory.
 
     Returns:
         A list of datetime.dates representing the journal dates to open.
@@ -23,8 +114,23 @@ def parse_dates(date_args, late_night_date_offset):
     parsed_dates = []
 
     for date_string in date_args:
+        # Check for journal head
         try:
-            # Check for negative offsetting first
+            assert date_string.lower() in ("head", "last", "latest")
+
+            parsed_dates.append(find_lastest_existing_entry(journal_path))
+
+            continue
+        except JournalHeadNotFoundException:
+            # No journal head!
+            print("No existing journal entry found!", file=sys.stderr)
+
+            continue
+        except AssertionError:
+            pass
+
+        # Check for negative offsetting
+        try:
             offset = int(date_string)
 
             if offset > 0:
@@ -38,15 +144,23 @@ def parse_dates(date_args, late_night_date_offset):
                 + datetime.timedelta(days=offset)
                 + late_night_date_offset
             )
+
+            continue
         except ValueError:
-            try:
-                # Assume the date-string is a date, not an offset
-                parsed_dates.append(
-                    dateutil.parser.parse(date_string, fuzzy=True).date()
-                )
-            except ValueError:
-                # The date given was not valid!
-                print("%s is not a valid date!" % date_string, file=sys.stderr)
+            pass
+
+        # Assume the date-string is a proper date
+        try:
+            parsed_dates.append(
+                dateutil.parser.parse(date_string, fuzzy=True).date()
+            )
+
+            continue
+        except ValueError:
+            pass
+
+        # The date given was not valid!
+        print("%s is not a valid date!" % date_string, file=sys.stderr)
 
     return parsed_dates
 
@@ -132,7 +246,6 @@ def open_entry(
             to. Almost certainly you want to use the default standard error
             output.
     """
-
     # Determine path the journal entry text file
     year_dir_path = os.path.join(journal_path, str(date.year))
     entry_path = os.path.join(
