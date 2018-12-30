@@ -84,13 +84,13 @@ def main():
         dates = [today + latenight_date_offset]
 
     # Determine whether to write timestamp based on runtime args
-    writetimestamp = runtime_args.timestamp or (
+    write_timestamp = runtime_args.timestamp or (
         config_dict[WRITE_TIMESTAMPS_BY_DEFAULT]
         and not runtime_args.no_timestamp
     )
 
     # Determine whether to only open existing files
-    readmode = (
+    read_mode = (
         bool(runtime_args.dates)
         and not config_dict[CREATE_NEW_ENTRIES_WHEN_SPECIFYING_DATES]
     )
@@ -101,8 +101,8 @@ def main():
             date,
             editor_name,
             config_dict[JOURNAL_PATH],
-            writetimestamp,
-            readmode,
+            write_timestamp,
+            read_mode,
         )
 
     # Exit
