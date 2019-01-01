@@ -1,6 +1,8 @@
 """Contains functions relating to opening journal entries."""
 
 import datetime
+from functools import reduce
+import operator
 import os
 import re
 import subprocess
@@ -8,13 +10,25 @@ import sys
 import dateutil.parser
 
 
-class JournalNotFoundException(Exception):
-    """A general exception used when a journal entry can't be found."""
+class EntryNotFoundException(Exception):
+    """A general exception used when an entry can't be found."""
 
     pass
 
 
-class JournalHeadNotFoundException(JournalNotFoundException):
+class EntryAncestorNotFoundException(EntryNotFoundException):
+    """An exception used when an entry's ancestor can't be found."""
+
+    pass
+
+
+class EntryArgumentNotFoundException(EntryNotFoundException):
+    """An exception used a passed in entry date can't be found."""
+
+    pass
+
+
+class JournalHeadNotFoundException(EntryNotFoundException):
     """An exception used when no journal head can be found."""
 
     pass
@@ -44,13 +58,13 @@ def get_years_existing_entry_dates(year, journal_path):
     The dates are returned in ascending order.
 
     Args:
-        year: An string specifying the year to get journal entries for.
+        year: An string specifying the year to get entries for.
         journal_path: A string containing the path to the journal's base
             directory.
 
     Returns:
         A list of datetime.dates corresponsing to dates for which there
-        are existing journal entries.
+        are existing entries within the specified year.
     """
     # Get all file names
     year_dir_path = os.path.join(journal_path, year)
@@ -69,6 +83,79 @@ def get_years_existing_entry_dates(year, journal_path):
     return sorted(dates)
 
 
+def get_all_entry_dates(journal_path):
+    """Get a list of all existing entry dates.
+
+    Sorted in ascending order.
+
+    Args:
+        journal_path: A string containing the path to the journal's base
+            directory.
+
+    Returns:
+        A list of datetime.dates corresponsing to dates for which there
+        are existing entries.
+    """
+    entries_by_year = [
+        entry
+        for entry in [
+            get_years_existing_entry_dates(year, journal_path)
+            for year in get_existing_year_directories(journal_path)
+        ]
+    ]
+
+    # See https://stackoverflow.com/a/45323085 for a comparison of
+    # flattening solutions in Python (hint: it's the one I'm using here)
+    return reduce(operator.iconcat, entries_by_year, [])
+
+
+def find_entrys_nth_ancestor(date, n, journal_path):
+    """Find a given entry's nth ancestor.
+
+    Ancestors meaning the existing entries preceding the date
+    corresponding to an existing entry. n can be any integer: note that
+    negative or vanishing n is fine.
+
+    Args:
+        date: A datetime.date object corresponding to an existing
+            entry's date.
+        n: An integer specifying the nth ancestor of the passed.
+        journal_path: A string containing the path to the journal's base
+            directory.
+
+    Returns:
+        A datetime.date corresponding to the nth ancestor of the entry
+        given by the passed in date.
+
+    Raises:
+        EntryAncestorNotFoundException: The entry's nth ancestor can't
+            be found.
+        EntryArgumentNotFoundException: The entry corresponding to the
+            passed in date doesn't exist.
+    """
+    # Get all the existing entry dates. This could be optimized to
+    # include fewer years, but realistically, it's so fast anyway that I
+    # don't care; grabbing all entries greatly simplifies the logic of
+    # this function.
+    year_entries = get_all_entry_dates(journal_path)
+
+    # Get the index of the target entry
+    try:
+        target_index = year_entries.index(date)
+    except ValueError:
+        # Passed in date doesn't have an entry!
+        raise EntryArgumentNotFoundException
+
+    # Calculate the ancestor's index and validate
+    ancestor_index = target_index - n
+
+    if ancestor_index < 0 or ancestor_index >= len(year_entries):
+        raise EntryAncestorNotFoundException
+
+    # Valid. Return the date.
+    return year_entries[ancestor_index]
+
+
 def find_lastest_existing_entry(journal_path):
     """Find the latest existing journal entry's date.
 
@@ -78,12 +165,12 @@ def find_lastest_existing_entry(journal_path):
 
     Returns:
         A datetime.date specifying the date corresponding to the latest
-        journal entry.
+        entry.
 
     Raises:
-        JournalHeadNotFoundException: The latest journal couldn't be found.
+        JournalHeadNotFoundException: The latest entry couldn't be found.
     """
-    # Iterate through existing years until we find an existing journal
+    # Iterate through existing years until we find an existing entry
     existing_years = get_existing_year_directories(journal_path)
 
     for year in existing_years[::-1]:
@@ -94,6 +181,50 @@ def find_lastest_existing_entry(journal_path):
 
     # No journal head found
     raise JournalHeadNotFoundException
+
+
+def parse_ancestor_offsets(date_arg):
+    """Parse any ancestor offsets in date runtime argument.
+
+    The date argument passed in doesn't *need* to have any of these
+    offsets.
+
+    Args:
+        date_arg: A string containing a date argument to be
+            parsed.
+
+    Returns:
+        A two-tuple containing the passed in date argument with the
+        offest portion removed and an integer N specifying that the date
+        argument's offsets have said to use the Nth ancestor of the
+        passed in date.
+    """
+    tilde_pattern = r".*~(-?\d*)$"
+    offset = 0
+
+    while True:
+        # Test for caret
+        if date_arg.endswith("^"):
+            offset += 1
+
+            date_arg = date_arg[:-1]
+
+            continue
+
+        # Test for tilde offsetting
+        regex_match = re.match(tilde_pattern, date_arg)
+
+        if regex_match and regex_match.group(1):
+            offset_str = regex_match.group(1)
+
+            offset += int(offset_str)
+
+            date_arg = date_arg[: -(len(offset_str) + 1)]
+
+            continue
+
+        # No offsets left to parse
+        return (date_arg, offset)
 
 
 def parse_dates(date_args, late_night_date_offset, journal_path):
@@ -108,19 +239,23 @@ def parse_dates(date_args, late_night_date_offset, journal_path):
             directory.
 
     Returns:
-        A list of datetime.dates representing the journal dates to open.
+        A list of datetime.dates representing the entry dates to open.
     """
     # Parse dates given in runtime argument
     parsed_dates = []
 
     for date_string in date_args:
+        original_date_string = date_string
+        parsed_date = None
+
+        # First check of ancestor offseting
+        date_string, ancestor_offset = parse_ancestor_offsets(date_string)
+
         # Check for journal head
         try:
             assert date_string.lower() in ("head", "last", "latest")
 
-            parsed_dates.append(find_lastest_existing_entry(journal_path))
-
-            continue
+            parsed_date = find_lastest_existing_entry(journal_path)
         except JournalHeadNotFoundException:
             # No journal head!
             print("No existing journal entry found!", file=sys.stderr)
@@ -129,52 +264,85 @@ def parse_dates(date_args, late_night_date_offset, journal_path):
         except AssertionError:
             pass
 
-        # Check for negative offsetting
-        try:
-            offset = int(date_string)
+        # Check for negative date offsetting
+        if parsed_date is None:
+            try:
+                date_offset = int(date_string)
 
-            if offset > 0:
-                # Don't allow offseting from the future. Check if the
-                # argument passed in is a date instead
-                raise ValueError
+                if date_offset > 0:
+                    # Don't allow date offseting from the future. Check
+                    # if the argument passed in is a date instead
+                    raise ValueError
 
-            # Create datetime object using offset from current day
-            parsed_dates.append(
-                datetime.date.today()
-                + datetime.timedelta(days=offset)
-                + late_night_date_offset
-            )
+                # Create datetime object using date offset from current
+                # day
+                parsed_date = (
+                    datetime.date.today()
+                    + datetime.timedelta(days=date_offset)
+                    + late_night_date_offset
+                )
+            except ValueError:
+                pass
+
+        # Check if the date-string is a proper date
+        if parsed_date is None:
+            try:
+                parsed_date = dateutil.parser.parse(
+                    date_string, fuzzy=True
+                ).date()
+            except ValueError:
+                pass
+
+        # Complain if the date couldn't be parsed
+        if parsed_date is None:
+            print("%s is not a valid date!" % date_string, file=sys.stderr)
 
             continue
-        except ValueError:
-            pass
 
-        # Assume the date-string is a proper date
-        try:
-            parsed_dates.append(
-                dateutil.parser.parse(date_string, fuzzy=True).date()
-            )
+        # Apply ancestor offseting if any was given
+        if ancestor_offset:
+            try:
+                parsed_date = find_entrys_nth_ancestor(
+                    parsed_date, ancestor_offset, journal_path
+                )
+            except EntryArgumentNotFoundException:
+                # No entry to base ancestor off of
+                print(
+                    "Base of %s does not correspond to an existing entry!"
+                    % original_date_string,
+                    file=sys.stderr,
+                )
+                print(
+                    "Ancestor lookup needs to be based on an existing entry!",
+                    file=sys.stderr,
+                )
 
-            continue
-        except ValueError:
-            pass
+                continue
+            except EntryAncestorNotFoundException:
+                # Ancestor does not exist
+                print(
+                    "Ancestor %s does not exist!" % original_date_string,
+                    file=sys.stderr,
+                )
 
-        # The date given was not valid!
-        print("%s is not a valid date!" % date_string, file=sys.stderr)
+                continue
+
+        # All good!
+        parsed_dates.append(parsed_date)
 
     return parsed_dates
 
 
 def write_timestamp(entry_path, this_datetime=datetime.datetime.today()):
-    """Write timestamp to journal entry, if one doesn't already exist.
+    """Write timestamp to entry, if one doesn't already exist.
 
     Modifies a text file to include the passed in datetime's time and
     possibly date in ISO 8601 format. How this works depends on the file
     being created/modified:
 
-    (1) If the journal entry text file doesn't already exist, create it
+    (1) If the entry text file doesn't already exist, create it
         and write the date and time to the top of the file.
-    (2) If the journal entry already exists, look inside and see if
+    (2) If the entry already exists, look inside and see if
         the datetime's date is already written.  If the datetime's date
         is not written, append the date and time to the file, ensuring
         at least one empty line between the date and time and whatever
@@ -183,8 +351,8 @@ def write_timestamp(entry_path, this_datetime=datetime.datetime.today()):
         the time.
 
     Args:
-        entry_path: A string containing a path to a journal entry,
-            already created or not.
+        entry_path: A string containing a path to a entry, already
+            created or not.
         this_datetime: An optional datetime.datetime object representing
             the time to write a timestamp for.
     """
@@ -192,8 +360,8 @@ def write_timestamp(entry_path, this_datetime=datetime.datetime.today()):
     this_date = this_datetime.strftime("%Y-%m-%d")
     this_time = this_datetime.strftime("%H:%M")
 
-    # Check if journal entry already exists. If so write, the date and
-    # time to it.
+    # Check if entry already exists. If so write, the date and time to
+    # it.
     if not os.path.isfile(entry_path):
         with open(entry_path, "x") as jrnl_entry:
             jrnl_entry.write(this_date + "\n" + this_time + "\n")
@@ -239,14 +407,14 @@ def open_entry(
         journal_path: A string containing the path to the journal's base
             directory.
         do_timestamp: A boolean signalling whether to append a timestamp
-            to a journal entry before opening.
+            to a entry before opening.
         in_read_mode: A boolean signalling whether to only open existing
             entries ("read mode").
         error_stream: An optional TextIO object to send error messages
             to. Almost certainly you want to use the default standard error
             output.
     """
-    # Determine path the journal entry text file
+    # Determine path the entry text file
     year_dir_path = os.path.join(journal_path, str(date.year))
     entry_path = os.path.join(
         year_dir_path, date.strftime("%Y-%m-%d") + ".txt"
@@ -261,9 +429,9 @@ def open_entry(
     if not os.path.isdir(year_dir_path):
         os.makedirs(year_dir_path)
 
-    # Append *right now*'s timestamp to journal entry if specified
+    # Append *right now*'s timestamp to entry if specified
     if do_timestamp:
         write_timestamp(entry_path)
 
-    # Open the date's journal
+    # Open the date's entry
     subprocess.Popen([editor, entry_path]).wait()
