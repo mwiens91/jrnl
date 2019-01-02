@@ -324,6 +324,12 @@ def parse_dates(date_args, late_night_date_offset, journal_path):
                     + datetime.timedelta(days=date_offset)
                     + late_night_date_offset
                 )
+            except OverflowError:
+                print(
+                    "%s is too large an offset!" % date_offset, file=sys.stderr
+                )
+
+                continue
             except ValueError:
                 pass
 
