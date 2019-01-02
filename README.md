@@ -82,6 +82,40 @@ month's date with
 jrnl 4
 ```
 
+### Accessing the latest existing entry
+
+You can open the latest existing journal entry with `HEAD` like so:
+
+```
+jrnl HEAD
+```
+
+Aliases for `HEAD` are `LAST` and `LATEST`—all of which are case
+insensitive.
+
+### Accessing an existing entry's ancestor
+
+You can access the ancestor of an existing entry with suffixes `^` or
+`~N` (for the Nth ancestor). These work almost identically to the same
+suffixes in `git`. For example, to find the fifth last existing journal
+enty, you can do
+
+```
+jrnl HEAD~5
+```
+
+These suffixes can be stacked and combined in any way you like.
+
+### Accessing the closest existing entry's for a given date
+
+To access the closest existing journal entry for a given date, add the
+`@` suffix to the date. For example, to find the closest entry to
+2017-01-01, you'd do
+
+```
+jrnl @2017-01-01
+```
+
 ### Opening multiple entries
 
 To open up multiple entries simply pass in multiple date arguments. For
