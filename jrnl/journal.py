@@ -8,6 +8,7 @@ import re
 import subprocess
 import sys
 import dateutil.parser
+from .helpers import find_closest_date
 
 
 class EntryNotFoundException(Exception):
@@ -24,6 +25,12 @@ class EntryAncestorNotFoundException(EntryNotFoundException):
 
 class EntryArgumentNotFoundException(EntryNotFoundException):
     """An exception used a passed in entry date can't be found."""
+
+    pass
+
+
+class EntryNeighbourNotFoundException(EntryNotFoundException):
+    """An exception used when an entry's neighbour can't be found."""
 
     pass
 
@@ -156,6 +163,32 @@ def find_entrys_nth_ancestor(date, n, journal_path):
     return year_entries[ancestor_index]
 
 
+def find_closest_existing_entry(date, journal_path):
+    """Find the closest existing entry given a date.
+
+    Args:
+        date: A datetime.date object to use to find a closest existing
+            entry date.
+        journal_path: A string containing the path to the journal's base
+            directory.
+
+    Returns:
+        A datetime.date corresponding to the closest existing entry to
+        the passed in date.
+
+    Raises:
+        EntryNeighbourNotFoundException: No existing entry could be
+            found.
+    """
+    # Get all the existing entry dates
+    year_entries = get_all_entry_dates(journal_path)
+
+    if not year_entries:
+        raise EntryAncestorNotFoundException
+
+    return find_closest_date(year_entries, date)
+
+
 def find_lastest_existing_entry(journal_path):
     """Find the latest existing journal entry's date.
 
@@ -247,9 +280,19 @@ def parse_dates(date_args, late_night_date_offset, journal_path):
     for date_string in date_args:
         original_date_string = date_string
         parsed_date = None
+        print(date_string)
 
         # First check of ancestor offseting
         date_string, ancestor_offset = parse_ancestor_offsets(date_string)
+
+        # Then check for prefix @ (find closest date)
+        if date_string.startswith("@"):
+            # Remove the prefix
+            date_string = date_string[1:]
+
+            do_find_closest_entry = True
+        else:
+            do_find_closest_entry = False
 
         # Check for journal head
         try:
@@ -298,6 +341,16 @@ def parse_dates(date_args, late_night_date_offset, journal_path):
             print("%s is not a valid date!" % date_string, file=sys.stderr)
 
             continue
+
+        # Apply @ matching if it was provided
+        if do_find_closest_entry:
+            try:
+                parsed_date = find_closest_existing_entry(
+                    parsed_date, journal_path
+                )
+            except EntryNeighbourNotFoundException:
+                # No existing journal entries!
+                print("No existing journal entry found!", file=sys.stderr)
 
         # Apply ancestor offseting if any was given
         if ancestor_offset:

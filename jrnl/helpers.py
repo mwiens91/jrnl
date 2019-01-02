@@ -1,8 +1,42 @@
 """Contains a few helper functions."""
 
+from bisect import bisect_left
 from distutils.util import strtobool
 import os
 import subprocess
+
+
+def find_closest_date(date_list, target_date):
+    """Finds the closest date to a target date.
+
+    This requires the date list to be sorted. If two dates are equally
+    close, return the older date.
+
+    Adapted from Lauritz V. Thaulow's post on Stack Overflow here:
+    https://stackoverflow.com/a/12141511.
+
+    Args:
+        date_list: A sorted list of datetime.dates.
+        target_date: A target datetime.date.
+
+    Returns:
+        A datetime.date corresponding to the closest date in the date
+        list to the target date.
+    """
+    pos = bisect_left(date_list, target_date)
+
+    if pos == 0:
+        return date_list[0]
+    if pos == len(date_list):
+        return date_list[-1]
+
+    before = date_list[pos - 1]
+    after = date_list[pos]
+
+    if after - target_date < target_date - before:
+        return after
+
+    return before
 
 
 def get_user_editor():
