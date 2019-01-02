@@ -1,6 +1,6 @@
 .\" Manpage for jrnl
 
-.TH jrnl 1 "September 2017" "" ""
+.TH jrnl 1 "January 2019" "" ""
 
 .SH NAME
 jrnl \- write a journal
@@ -12,9 +12,18 @@ jrnl \- write a journal
 \fIjrnl\fR is a program to help manage a personal journal. This needs a configuration file to run, which can be generated with the \fI--setup\fR option.
 
 .SH DATES
-If you don't supply any dates, \fIjrnl\fR will open a journal entry for today's date and, if you tell it to, write a timestamp at right now's time. Otherwise you can specify a number of dates to open using a combination of any sensible date formats or an integer offset from today's date. If you do specify dates, by default this will not create new entries, but you can change this behavior in the config file.
+If you don't supply any dates, \fIjrnl\fR will open a journal entry for today's date and, if you tell it to, write a timestamp at right now's time. Otherwise you can specify a number of dates to open using a combination of any sensible date format or an integer offset from today's date.
+
+You can also open the lastest existing journal entry with \fIHEAD\fR, and access journal entry ancestors of any date corresponding to an existing entry with \fI^\fR or \fI~N\fR date suffixes. To open an existing entry closest to a specified date, prepend that date argument with \fI@\fR.
+
+If you do specify dates, by default this will not create new entries, but you can change this behavior in the config file.
 
 .SH OPTIONS
+.
+.TP
+\fB-e --editor\fR
+specify editor to open entry with
+.
 .
 .TP
 \fB-h --help\fR
