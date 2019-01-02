@@ -105,6 +105,7 @@ def parse_runtime_arguments():
             help=("journal date(s) to open." " Defaults to right now."),
             nargs="*",
         )
+        parser.add_argument("-e", "--editor", help="editor to use")
         parser.add_argument(
             "--setup",
             help="print configuration file and exit",

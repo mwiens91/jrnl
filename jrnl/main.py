@@ -53,7 +53,9 @@ def main():
             sys.exit(0)
 
     # Figure out what editor to use
-    if is_program_available(config_dict[EDITOR]):
+    if runtime_args.editor is not None:
+        editor_name = runtime_args.editor
+    elif is_program_available(config_dict[EDITOR]):
         editor_name = config_dict[EDITOR]
     elif is_program_available("sensible-editor"):
         editor_name = "sensible-editor"
