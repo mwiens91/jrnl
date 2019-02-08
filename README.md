@@ -106,7 +106,7 @@ jrnl HEAD~5
 
 These suffixes can be stacked and combined in any way you like.
 
-### Accessing the closest existing entry's for a given date
+### Accessing the closest existing entry to a given date
 
 To access the closest existing journal entry for a given date, add the
 `@` suffix to the date. For example, to find the closest entry to
