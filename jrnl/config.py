@@ -50,7 +50,7 @@ def get_config():
             with open(config_path, "r") as config_file:
                 # Try loading the config file
                 try:
-                    config_dict = yaml.load(config_file)
+                    config_dict = yaml.safe_load(config_file)
                 except yaml.YAMLError:
                     # Bad config file
                     raise ConfigInvalidException
