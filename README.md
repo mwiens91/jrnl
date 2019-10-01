@@ -6,7 +6,7 @@
 
 # jrnl
 
-jrnl is a program to help manage a personal journal.
+jrnl is a personal journal management application.
 
 ## Usage
 
@@ -140,13 +140,12 @@ earlier, jrnl will open up the day before's journal entry.
 
 :confused: What? Here's the motivation:
 
-When it's 02:00, we're likely to refer this time as night, rather than
-morning. Likewise, you might want a journal chunk (for lack of a better
-term) written at 02:00 to be in the same entry as chunks from
+When it's 02:00, we're likely to refer to this time as night, rather
+than morning. Likewise, you might want a journal chunk (for lack of a
+better term) written at 02:00 to be in the same entry as chunks from
 (technically) the previous day. If you do want such a thing, you can
-specify a time in your config file. At any time before this specified time (inclusive),
-jrnl will open up the day before's journal entry, as shown in the
-snippet above.
+specify a time in your config file: at any time before this specified
+time (inclusive), jrnl will open up the day before's journal entry.
 
 ## Journal structure
 
