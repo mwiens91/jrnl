@@ -91,8 +91,7 @@ def main():
 
     # Determine whether to write timestamp based on runtime args
     write_timestamp = runtime_args.timestamp or (
-        config_dict[WRITE_TIMESTAMPS_BY_DEFAULT]
-        and not runtime_args.no_timestamp
+        config_dict[WRITE_TIMESTAMPS_BY_DEFAULT] and not runtime_args.no_timestamp
     )
 
     # Determine whether to only open existing files

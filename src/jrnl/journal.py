@@ -54,9 +54,7 @@ def get_existing_year_directories(journal_path):
         A list of strings containing years for which there are year
         directories in the journal's base directory.
     """
-    return sorted(
-        [y for y in os.listdir(journal_path) if re.match(r"\d{4}", y)]
-    )
+    return sorted([y for y in os.listdir(journal_path) if re.match(r"\d{4}", y)])
 
 
 def get_years_existing_entry_dates(year, journal_path):
@@ -78,14 +76,10 @@ def get_years_existing_entry_dates(year, journal_path):
     file_names = os.listdir(year_dir_path)
 
     # Filter for valid dates
-    date_strings = [
-        d[:-4] for d in file_names if re.match(r"\d{4}-\d{2}-\d{2}.txt", d)
-    ]
+    date_strings = [d[:-4] for d in file_names if re.match(r"\d{4}-\d{2}-\d{2}.txt", d)]
 
     # Build date objects for the dates
-    dates = [
-        datetime.datetime.strptime(d, "%Y-%m-%d").date() for d in date_strings
-    ]
+    dates = [datetime.datetime.strptime(d, "%Y-%m-%d").date() for d in date_strings]
 
     return sorted(dates)
 
@@ -324,9 +318,7 @@ def parse_dates(date_args, late_night_date_offset, journal_path):
                     + late_night_date_offset
                 )
             except OverflowError:
-                print(
-                    "%s is too large an offset!" % date_offset, file=sys.stderr
-                )
+                print("%s is too large an offset!" % date_offset, file=sys.stderr)
 
                 continue
             except ValueError:
@@ -335,9 +327,7 @@ def parse_dates(date_args, late_night_date_offset, journal_path):
         # Check if the date-string is a proper date
         if parsed_date is None:
             try:
-                parsed_date = dateutil.parser.parse(
-                    date_string, fuzzy=True
-                ).date()
+                parsed_date = dateutil.parser.parse(date_string, fuzzy=True).date()
             except ValueError:
                 pass
 
@@ -350,9 +340,7 @@ def parse_dates(date_args, late_night_date_offset, journal_path):
         # Apply @ matching if it was provided
         if do_find_closest_entry:
             try:
-                parsed_date = find_closest_existing_entry(
-                    parsed_date, journal_path
-                )
+                parsed_date = find_closest_existing_entry(parsed_date, journal_path)
             except EntryNeighbourNotFoundException:
                 # No existing journal entries!
                 print("No existing journal entry found!", file=sys.stderr)
@@ -474,9 +462,7 @@ def open_entry(
     """
     # Determine path the entry text file
     year_dir_path = os.path.join(journal_path, str(date.year))
-    entry_path = os.path.join(
-        year_dir_path, date.strftime("%Y-%m-%d") + ".txt"
-    )
+    entry_path = os.path.join(year_dir_path, date.strftime("%Y-%m-%d") + ".txt")
 
     # If in read mode, only open existing entries
     if in_read_mode and not os.path.exists(entry_path):

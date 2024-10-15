@@ -37,7 +37,6 @@ Issues = "https://github.com/mwiens91/jrnl/issues"
 Source = "https://github.com/mwiens91/jrnl"
 
 [tool.black]
-line-length = 79
 target-version = ['py310', 'py311', 'py312']
 
 [tool.hatch.build.targets.wheel]

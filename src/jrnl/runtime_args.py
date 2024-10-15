@@ -32,9 +32,7 @@ class PrintConfigAction(argparse.Action):
         print("# Save this configuration file in any of the following:")
         print("# ~/.jrnlrc\t~/.config/jrnl.conf\t$XDG_CONFIG_HOME/jrnl.conf")
         print("#")
-        print(
-            "# '" + HOURS_PAST_MIDNIGHT_INCLUDED_IN_DATE + "' is the number of"
-        )
+        print("# '" + HOURS_PAST_MIDNIGHT_INCLUDED_IN_DATE + "' is the number of")
         print("# hours into the next date a date's journal entries should")
         print("# cover. Example: say this setting is set to 4. Then if it")
         print("# was 03:00 on 2018-03-03, jrnl would open up 2018-03-02's")
@@ -74,9 +72,7 @@ def parse_runtime_arguments():
         return parser_.add_subparsers(dest="subparser_name", title="commands")
 
     # Instantiate the parser
-    parser = argparse.ArgumentParser(
-        prog=NAME, description="%(prog)s - " + DESCRIPTION
-    )
+    parser = argparse.ArgumentParser(prog=NAME, description="%(prog)s - " + DESCRIPTION)
 
     # Give subparser support if using grep
     if give_grep_priority:
