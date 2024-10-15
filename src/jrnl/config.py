@@ -41,8 +41,8 @@ def get_config() -> dict[str, str | bool | int]:
     ]
 
     # Also look in XDG dirs, provided they exist
-    if os.environ.get("XDG_CONFIG_HOME"):
-        possible_configs += [os.environ.get("XDG_CONFIG_HOME") + "/jrnl.conf"]
+    if config_home := os.environ.get("XDG_CONFIG_HOME"):
+        possible_configs += [config_home + "/jrnl.conf"]
 
     # Iterate through all possible config files
     for config_path in possible_configs:
