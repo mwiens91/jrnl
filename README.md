@@ -1,4 +1,3 @@
-[![Build Status](https://app.travis-ci.com/mwiens91/jrnl.svg?token=DNh4uxofjx3aPNY7ZLiu&branch=master)](https://app.travis-ci.com/mwiens91/jrnl)
 [![PyPI](https://img.shields.io/pypi/v/jrnl-mw.svg)](https://pypi.org/project/jrnl-mw/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/jrnl-mw.svg)](https://pypi.org/project/jrnl-mw/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
