@@ -175,7 +175,7 @@ And more stuff here.
 ## How do I install this?
 
 ```
-sudo pip3 install jrnl-mw
+pix install jrnl-mw
 ```
 
 or just run the [`run_jrnl.py`](run_jrnl.py) script directly.
