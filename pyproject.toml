@@ -8,7 +8,7 @@ dynamic = ["version"]
 description = "Write a journal"
 readme = "README.md"
 license = "MIT"
-requires-python = ">=3.6"
+requires-python = ">=3.10"
 authors = [
     { name = "Matt Wiens", email = "mwiens91@gmail.com" },
 ]
@@ -38,7 +38,7 @@ Source = "https://github.com/mwiens91/jrnl"
 
 [tool.black]
 line-length = 79
-target-version = ['py36', 'py37', 'py38', 'py39']
+target-version = ['py310', 'py311', 'py312']
 
 [tool.hatch.build.targets.wheel]
 man = "/usr/local/man/man1"
