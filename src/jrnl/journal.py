@@ -275,7 +275,7 @@ def parse_dates(date_args, late_night_date_offset, journal_path):
         original_date_string = date_string
         parsed_date = None
 
-        # First check of ancestor offseting
+        # First deal with ancestor offseting
         date_string, ancestor_offset = parse_ancestor_offsets(date_string)
 
         # Then check for prefix @ (find closest date)
