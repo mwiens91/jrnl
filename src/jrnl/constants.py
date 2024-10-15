@@ -1,6 +1,5 @@
 """Contains constants for the program."""
 
-
 # The options which must be specified in config file
 EDITOR = "editor"
 JOURNAL_PATH = "journal_path"
