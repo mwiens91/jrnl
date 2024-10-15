@@ -234,29 +234,29 @@ def parse_ancestor_offsets(date_arg: str) -> tuple[str, int]:
     tilde_pattern = r".*~(-?\d*)$"
     offset = 0
 
-    while True:
-        # Test for caret
-        if date_arg.endswith("^"):
-            offset += 1
+    # Deal with caret offsetting
+    saw_caret = False
 
-            date_arg = date_arg[:-1]
+    while date_arg.endswith("^"):
+        saw_caret = True
 
-            continue
+        offset += 1
+        date_arg = date_arg[:-1]
 
-        # Test for tilde offsetting
-        regex_match = re.match(tilde_pattern, date_arg)
-
-        if regex_match and regex_match.group(1):
-            offset_str = regex_match.group(1)
-
-            offset += int(offset_str)
-
-            date_arg = date_arg[: -(len(offset_str) + 1)]
-
-            continue
-
-        # No offsets left to parse
+    if saw_caret:
         return (date_arg, offset)
+
+    # Deal with tilde offsetting
+    regex_match = re.match(tilde_pattern, date_arg)
+
+    if regex_match and regex_match.group(1):
+        offset_str = regex_match.group(1)
+
+        offset += int(offset_str)
+        date_arg = date_arg[: -(len(offset_str) + 1)]
+
+    # No offsets left to parse
+    return (date_arg, offset)
 
 
 def parse_dates(
