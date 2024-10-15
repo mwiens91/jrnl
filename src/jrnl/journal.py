@@ -178,7 +178,7 @@ def find_closest_existing_entry(date, journal_path):
     year_entries = get_all_entry_dates(journal_path)
 
     if not year_entries:
-        raise EntryAncestorNotFoundException
+        raise EntryNeighbourNotFoundException
 
     return find_closest_date(year_entries, date)
 
