@@ -1,7 +1,7 @@
 """Contains a few helper functions."""
 
 from bisect import bisect_left
-from distutils.util import strtobool
+import datetime
 import os
 import subprocess
 
@@ -75,8 +75,6 @@ def prompt(query):
     """Prompt a yes/no question and get an answer.
 
     A simple function to ask yes/no questions on the command line.
-    Credit goes to Matt Stevenson. See:
-    http://mattoc.com/python-yes-no-prompt-cli.html
 
     Args:
         query: A string containing a question.
@@ -86,10 +84,23 @@ def prompt(query):
     """
     print("%s [y/n]: " % query)
     val = input().lower()
+
+    def strtobool(s: str) -> bool:
+        """Very similar to deprecated distutils.util.strtobool."""
+        s_low = s.lower()
+
+        if s_low in ("y", "yes"):
+            return True
+        elif s_low in ("n", "no"):
+            return False
+
+        raise ValueError
+
     try:
         result = strtobool(val)
     except ValueError:
         # Result no good! Ask again.
         print("Please answer with y/n")
         return prompt(query)
+
     return result
