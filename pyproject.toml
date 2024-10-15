@@ -1,17 +1,54 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "jrnl-mw"
+dynamic = ["version"]
+description = "Write a journal"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.6"
+authors = [
+    { name = "Matt Wiens", email = "mwiens91@gmail.com" },
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: Unix",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+]
+dependencies = [
+    "python-dateutil",
+    "PyYAML",
+]
+
+[project.scripts]
+jrnl = "jrnl.main:main"
+
+[project.urls]
+Homepage = "https://github.com/mwiens91/jrnl"
+Documentation = "https://github.com/mwiens91/jrnl#readme"
+Issues = "https://github.com/mwiens91/jrnl/issues"
+Source = "https://github.com/mwiens91/jrnl"
+
 [tool.black]
 line-length = 79
 target-version = ['py36', 'py37', 'py38', 'py39']
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | buck-out
-  | build
-  | dist
-)/
-'''
+
+[tool.hatch.build.targets.wheel]
+man = "/usr/local/man/man1"
+packages= ["src/jrnl"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/jrnl"]
+
+[tool.hatch.build.targets.wheel.shared-data]
+man = "/usr/local/man/man1"
+
+[tool.hatch.version]
+path = "src/jrnl/version.py"
