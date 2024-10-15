@@ -17,7 +17,7 @@ class ConfigInvalidException(Exception):
     pass
 
 
-def get_config():
+def get_config() -> dict[str, str | bool | int]:
     """Find and return config settings dictionary.
 
     Looks for config files located at

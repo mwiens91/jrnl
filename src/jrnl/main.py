@@ -17,7 +17,7 @@ from .journal import open_entry, parse_dates
 from .runtime_args import parse_runtime_arguments
 
 
-def main():
+def main() -> None:
     """Main program for jrnl."""
     # Parse runtime options
     runtime_args = parse_runtime_arguments()

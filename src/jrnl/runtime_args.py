@@ -44,7 +44,7 @@ class PrintConfigAction(argparse.Action):
         sys.exit(0)
 
 
-def parse_runtime_arguments():
+def parse_runtime_arguments() -> argparse.Namespace:
     """Parse runtime arguments using argparse.
 
     This will generally return runtime arguments as attributes, though
@@ -60,7 +60,7 @@ def parse_runtime_arguments():
     give_grep_priority = bool(len(sys.argv) > 1 and sys.argv[1] == "grep")
 
     # A function to add subparser support
-    def add_subparsers(parser_):
+    def add_subparsers(parser_: argparse.ArgumentParser) -> argparse._SubParsersAction:
         """Add subparser support for sub-commands.
 
         Args:

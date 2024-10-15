@@ -6,7 +6,9 @@ import os
 import subprocess
 
 
-def find_closest_date(date_list, target_date):
+def find_closest_date(
+    date_list: list[datetime.date], target_date: datetime.date
+) -> datetime.date:
     """Finds the closest date to a target date.
 
     This requires the date list to be sorted. If two dates are equally
@@ -39,7 +41,7 @@ def find_closest_date(date_list, target_date):
     return before
 
 
-def get_user_editor():
+def get_user_editor() -> str:
     """Return a string containing user's favourite editor."""
     # Try finding editor through environment variable lookup
     editor_name = os.environ.get("EDITOR")
@@ -51,7 +53,7 @@ def get_user_editor():
     return "editor_name_here"
 
 
-def is_program_available(program_name):
+def is_program_available(program_name: str) -> bool:
     """Find if program passed in is available.
 
     There's probably a better way to do this that's portable, and in a
@@ -71,7 +73,7 @@ def is_program_available(program_name):
     ).wait()
 
 
-def prompt(query):
+def prompt(query: str) -> bool:
     """Prompt a yes/no question and get an answer.
 
     A simple function to ask yes/no questions on the command line.

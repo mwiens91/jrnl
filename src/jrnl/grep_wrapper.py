@@ -3,7 +3,7 @@
 import subprocess
 
 
-def grep_wrapper(pattern, journal_root, extra_opts=None):
+def grep_wrapper(pattern: str, journal_root: str, extra_opts: list[str] | None = None):
     """Implements a grep search for jrnl.
 
     Args:

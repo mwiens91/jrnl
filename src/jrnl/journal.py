@@ -7,6 +7,7 @@ import os
 import re
 import subprocess
 import sys
+import typing
 import dateutil.parser
 from .helpers import find_closest_date
 
@@ -41,7 +42,7 @@ class JournalHeadNotFoundException(EntryNotFoundException):
     pass
 
 
-def get_existing_year_directories(journal_path):
+def get_existing_year_directories(journal_path: str) -> list[str]:
     """Get year strings for existing years in journal.
 
     The years are returned in ascending order.
@@ -57,7 +58,7 @@ def get_existing_year_directories(journal_path):
     return sorted([y for y in os.listdir(journal_path) if re.match(r"\d{4}", y)])
 
 
-def get_years_existing_entry_dates(year, journal_path):
+def get_years_existing_entry_dates(year: str, journal_path: str) -> list[datetime.date]:
     """Get dates for all existing journal entries within a given year.
 
     The dates are returned in ascending order.
@@ -84,7 +85,7 @@ def get_years_existing_entry_dates(year, journal_path):
     return sorted(dates)
 
 
-def get_all_entry_dates(journal_path):
+def get_all_entry_dates(journal_path: str) -> list[datetime.date]:
     """Get a list of all existing entry dates.
 
     Sorted in ascending order.
@@ -110,7 +111,9 @@ def get_all_entry_dates(journal_path):
     return reduce(operator.iconcat, entries_by_year, [])
 
 
-def find_entrys_nth_ancestor(date, n, journal_path):
+def find_entrys_nth_ancestor(
+    date: datetime.date, n: int, journal_path: str
+) -> datetime.date:
     """Find a given entry's nth ancestor.
 
     Ancestors meaning the existing entries preceding the date
@@ -157,7 +160,9 @@ def find_entrys_nth_ancestor(date, n, journal_path):
     return year_entries[ancestor_index]
 
 
-def find_closest_existing_entry(date, journal_path):
+def find_closest_existing_entry(
+    date: datetime.date, journal_path: str
+) -> datetime.date:
     """Find the closest existing entry given a date.
 
     Args:
@@ -183,7 +188,7 @@ def find_closest_existing_entry(date, journal_path):
     return find_closest_date(year_entries, date)
 
 
-def find_lastest_existing_entry(journal_path):
+def find_lastest_existing_entry(journal_path: str) -> datetime.date:
     """Find the latest existing journal entry's date.
 
     Args:
@@ -210,7 +215,7 @@ def find_lastest_existing_entry(journal_path):
     raise JournalHeadNotFoundException
 
 
-def parse_ancestor_offsets(date_arg):
+def parse_ancestor_offsets(date_arg: str) -> tuple[str, int]:
     """Parse any ancestor offsets in date runtime argument.
 
     The date argument passed in doesn't *need* to have any of these
@@ -254,7 +259,9 @@ def parse_ancestor_offsets(date_arg):
         return (date_arg, offset)
 
 
-def parse_dates(date_args, late_night_date_offset, journal_path):
+def parse_dates(
+    date_args: str, late_night_date_offset: datetime.timedelta, journal_path: str
+) -> list[datetime.date]:
     """Parse dates given in runtime arguments.
 
     Args:
@@ -379,7 +386,9 @@ def parse_dates(date_args, late_night_date_offset, journal_path):
     return parsed_dates
 
 
-def write_timestamp(entry_path, this_datetime=datetime.datetime.today()):
+def write_timestamp(
+    entry_path: str, this_datetime: datetime.datetime = datetime.datetime.today()
+) -> None:
     """Write timestamp to entry, if one doesn't already exist.
 
     Modifies a text file to include the passed in datetime's time and
@@ -437,13 +446,13 @@ def write_timestamp(entry_path, this_datetime=datetime.datetime.today()):
 
 
 def open_entry(
-    date,
-    editor,
-    journal_path,
-    do_timestamp,
-    in_read_mode,
-    error_stream=sys.stderr,
-):
+    date: datetime.date,
+    editor: str,
+    journal_path: str,
+    do_timestamp: bool,
+    in_read_mode: bool,
+    error_stream: typing.TextIO = sys.stderr,
+) -> None:
     """Try opening a journal entry.
 
     Args:
