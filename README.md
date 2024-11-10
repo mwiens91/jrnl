@@ -106,7 +106,7 @@ jrnl HEAD~5
 ### Accessing the closest existing entry to a given date
 
 To access the closest existing journal entry for a given date, add the
-`@` suffix to the date. For example, to find the closest entry to
+`@` prefix to the date. For example, to find the closest entry to
 2017-01-01, you'd do
 
 ```
