@@ -103,8 +103,6 @@ enty, you can do
 jrnl HEAD~5
 ```
 
-These suffixes can be stacked and combined in any way you like.
-
 ### Accessing the closest existing entry to a given date
 
 To access the closest existing journal entry for a given date, add the
