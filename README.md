@@ -172,7 +172,7 @@ And more stuff here.
 ## How do I install this?
 
 ```
-pix install jrnl-mw
+pipx install jrnl-mw
 ```
 
 or just run the [`run_jrnl.py`](run_jrnl.py) script directly.
