@@ -22,7 +22,7 @@ class PrintConfigAction(argparse.Action):
         # Build configuration file
         confdict = dict()
         confdict[EDITOR] = get_user_editor()
-        confdict[JOURNAL_PATH] = os.path.expanduser("~/path/to/journal")
+        confdict[JOURNAL_PATH] = "~/path/to/journal"
         confdict[HOURS_PAST_MIDNIGHT_INCLUDED_IN_DATE] = 4
         confdict[CREATE_NEW_ENTRIES_WHEN_SPECIFYING_DATES] = False
         confdict[WRITE_TIMESTAMPS_BY_DEFAULT] = True
