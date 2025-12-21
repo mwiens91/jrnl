@@ -2,7 +2,7 @@
 
 import os
 import yaml
-from .constants import CONFIG_KEYS
+from .constants import CONFIG_KEYS, JOURNAL_PATH
 
 
 class ConfigNotFoundException(Exception):
@@ -56,11 +56,17 @@ def get_config() -> dict[str, str | bool | int]:
                     raise ConfigInvalidException
 
                 # Verify the config file contains required options
-                if CONFIG_KEYS.issubset(set(config_dict.keys())):
-                    return config_dict
+                if not CONFIG_KEYS.issubset(set(config_dict.keys())):
+                    raise ConfigInvalidException
 
-                # Required option(s) not specified
-                raise ConfigInvalidException
+                # Expand path
+                # TODO: you should probably validate the path too and
+                # ensure it's a valid absolute path
+                config_dict[JOURNAL_PATH] = os.path.expanduser(
+                    os.path.expandvars(config_dict[JOURNAL_PATH])
+                )
+
+                return config_dict
 
     # None of earlier config files checked out
     raise ConfigNotFoundException
