@@ -1,7 +1,6 @@
 """Contains functions relating to parsing runtime args."""
 
 import argparse
-import os
 import sys
 import yaml
 from .constants import (
